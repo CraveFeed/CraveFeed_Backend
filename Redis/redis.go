@@ -1,20 +1,20 @@
 package Redis
 
 import (
+	"fmt"
 	"github.com/redis/go-redis/v9"
-	"os"
 )
 
 var client *redis.Client
-var connectionString = os.Getenv("REDIS_URL")
 
 func GetClient() *redis.Client {
 	if client == nil {
-		opt, err := redis.ParseURL(connectionString)
-		if err != nil {
-			panic(err)
-		}
-		client = redis.NewClient(opt)
+		fmt.Println("Creating a redis Client")
+		client = redis.NewClient(&redis.Options{
+			Addr:     "localhost:6379",
+			Password: "",
+			DB:       0,
+		})
 	}
 	return client
 }
