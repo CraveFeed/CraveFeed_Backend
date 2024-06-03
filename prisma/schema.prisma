@@ -15,8 +15,6 @@ model User {
   avatar    String?
   firstName String
   lastName  String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt // If we want to allow the user to edit his/her posts. From the Experience perspective.
   posts     Post[]
   likes     Like[]
   comments  Comment[]
@@ -30,7 +28,6 @@ model Post {
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
   title        String
-  published    Boolean
   description  String?
   longitude    Float
   latitude     Float
