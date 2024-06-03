@@ -32,7 +32,6 @@ func main() {
 	if err != nil {
 		fmt.Println("Database cannot be connected")
 	}
-
 	defer func() {
 		if db.Client != nil {
 			db.Client.Disconnect()
