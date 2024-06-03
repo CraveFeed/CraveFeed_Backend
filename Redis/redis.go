@@ -11,7 +11,7 @@ func GetClient() *redis.Client {
 	if client == nil {
 		fmt.Println("Creating a redis Client")
 		client = redis.NewClient(&redis.Options{
-			Addr:     "localhost:6379",
+			Addr:     "localhost:6379", //Everyone spin up a local Redis Server for testing
 			Password: "",
 			DB:       0,
 		})

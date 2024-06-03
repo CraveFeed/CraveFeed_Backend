@@ -14,13 +14,13 @@ type CreateUserRequest struct {
 }
 
 type CreatePostRequest struct {
-	Title       string   `json:"title"`
-	Description string   `json:"description"`
-	Longitude   float64  `json:"longitude"`
-	Latitude    float64  `json:"latitude"`
-	Pictures    []string `json:"pictures"`
-	City        string   `json:"city"`
-	UserID      string   `json:"userId"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	Longitude   string `json:"longitude"`
+	Latitude    string `json:"latitude"`
+	Pictures    string `json:"pictures"`
+	City        string `json:"city"`
+	UserID      string `json:"userId"`
 }
 
 type CreateCommentRequest struct {

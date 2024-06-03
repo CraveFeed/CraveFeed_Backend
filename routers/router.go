@@ -22,6 +22,8 @@ func Routes() http.Handler {
 	}))
 
 	router.Post("/getName", controllers.GetName)
+	router.Post("/createUser", controllers.CreateUser)
+	router.Post("/createPost", controllers.CreatePost)
 
 	return router
 

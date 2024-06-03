@@ -11,8 +11,8 @@ model User {
   id        String    @id @default(cuid())
   email     String    @unique
   password  String
-  bio       String?
-  avatar    String?
+  bio       String
+  avatar    String
   firstName String
   lastName  String
   posts     Post[]
@@ -28,12 +28,12 @@ model Post {
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
   title        String
-  description  String?
-  longitude    Float
-  latitude     Float
-  pictures     String[]
-  city         String
+  description  String
+  longitude    String
+  latitude     String
+  pictures     String
   userId       String
+  city         String
   user         User        @relation(fields: [userId], references: [id])
   likes        Like[]
   comments     Comment[]
