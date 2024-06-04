@@ -24,7 +24,10 @@ func Routes() http.Handler {
 	router.Post("/getName", controllers.GetName)
 	router.Post("/createUser", controllers.CreateUser)
 	router.Post("/createPost", controllers.CreatePost)
-
+	router.Post("/createComment", controllers.CreateComment)
+	router.Post("/like", controllers.HandleLikeRequest)
+	router.Post("/follow", controllers.HandleFollowRequest)
+	
 	return router
 
 }
