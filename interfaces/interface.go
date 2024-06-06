@@ -1,9 +1,5 @@
 package interfaces
 
-type NameRequest struct {
-	Name string `json:"name"`
-}
-
 type CreateUserRequest struct {
 	Email     string `json:"email"`
 	Password  string `json:"password"`

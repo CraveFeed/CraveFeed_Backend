@@ -21,13 +21,13 @@ func Routes() http.Handler {
 		MaxAge:           300,
 	}))
 
-	router.Post("/getName", controllers.GetName)
 	router.Post("/createUser", controllers.CreateUser)
 	router.Post("/createPost", controllers.CreatePost)
 	router.Post("/createComment", controllers.CreateComment)
 	router.Post("/like", controllers.HandleLikeRequest)
 	router.Post("/follow", controllers.HandleFollowRequest)
-	
+	router.Post("/posts", controllers.GetAllPosts)
+
 	return router
 
 }
