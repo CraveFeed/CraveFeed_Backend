@@ -2,6 +2,7 @@ package main
 
 import (
 	"cravefeed_backend/Redis"
+	"cravefeed_backend/Redis/Caching"
 	"cravefeed_backend/database"
 	router "cravefeed_backend/routers"
 	"fmt"
@@ -29,14 +30,14 @@ func (app *Application) Serve() error {
 
 func main() {
 	db, err := database.ConnectDB()
-
-	Redis.GetClient()
-	defer Redis.CloseClient()
-
 	if err != nil {
 		fmt.Println("Database cannot be connected")
 	}
+	Redis.GetClient()
 
+	go Caching.UpdateCachePeriodically()
+
+	defer Redis.CloseClient()
 	defer func() {
 		if db.Client != nil {
 			db.Client.Disconnect()

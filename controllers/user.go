@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"cravefeed_backend/Redis/Caching"
 	database "cravefeed_backend/database"
 	helpers "cravefeed_backend/helper"
 	"cravefeed_backend/interfaces"
@@ -11,21 +12,19 @@ import (
 )
 
 func GetAllPosts(w http.ResponseWriter, r *http.Request) {
-	pClient := database.PClient
-	allPosts, err := pClient.Client.Post.FindMany().Exec(pClient.Context)
+	cachedData, err := Caching.FetchCachedData()
 	if err != nil {
-		fmt.Println("Cannot fetch users")
-		return
-
-	}
-	postsMap := make(map[string]interface{})
-	postsMap["posts"] = allPosts
-	err = helpers.WriteJSON(w, http.StatusOK, postsMap)
-	if err != nil {
-		fmt.Println("Cannot form response")
+		http.Error(w, "Cannot fetch cached data", http.StatusInternalServerError)
+		fmt.Println("Error fetching cached data:", err)
 		return
 	}
-
+	w.Header().Set("Content-Type", "application/json")
+	_, err = w.Write(cachedData)
+	if err != nil {
+		http.Error(w, "Error writing response", http.StatusInternalServerError)
+		fmt.Println("Error writing response:", err)
+		return
+	}
 }
 
 func CreateUser(w http.ResponseWriter, r *http.Request) { //Removed optional field in Avatar/Bio for testing
