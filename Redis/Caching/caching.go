@@ -51,6 +51,3 @@ func FetchCachedData() ([]byte, error) {
 	}
 	return cachedData, nil
 }
-
-//cachedPosts, _ = rdb.Get(ctx, cacheKey).Result()
-// Call this for the Machine Learning Models
