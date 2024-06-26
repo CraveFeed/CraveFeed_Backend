@@ -2,6 +2,7 @@ package Redis
 
 import (
 	"fmt"
+
 	"github.com/redis/go-redis/v9"
 )
 
@@ -11,7 +12,7 @@ func GetClient() *redis.Client {
 	if client == nil {
 		fmt.Println("Creating a redis Client")
 		client = redis.NewClient(&redis.Options{
-			Addr:     "localhost:6379", //Everyone spin up a local Redis Server for testing
+			Addr:     "redis:6379", //Everyone spin up a local Redis Server for testing
 			Password: "",
 			DB:       0,
 		})
