@@ -27,7 +27,8 @@ func Routes() http.Handler {
 	router.Post("/like", controllers.HandleLikeRequest)
 	router.Post("/follow", controllers.HandleFollowRequest)
 	router.Post("/posts", controllers.GetAllPosts)
-
+	router.Post("/getProfileInfo", controllers.GetProfileInfo)
+	router.Post("/getProfileBio", controllers.GetProfileBio)
 	return router
 
 }

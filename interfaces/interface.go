@@ -2,11 +2,16 @@ package interfaces
 
 type CreateUserRequest struct {
 	Email     string `json:"email"`
+	Username  string `json:"username"`
 	Password  string `json:"password"`
 	FirstName string `json:"firstName"`
 	LastName  string `json:"lastName"`
 	Bio       string `json:"bio"`    //Optional (Handle login in API)
 	Avatar    string `json:"avatar"` //Optional (Handle logic in API)
+}
+
+type CreateProfileRequest struct {
+	Id string `json:"id"`
 }
 
 type CreatePostRequest struct {

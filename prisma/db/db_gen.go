@@ -84,6 +84,7 @@ generator db {
 model User {
   id        String    @id @default(cuid())
   email     String    @unique
+  username  String    @unique
   password  String
   bio       String
   avatar    String
@@ -296,6 +297,7 @@ type UserScalarFieldEnum string
 const (
 	UserScalarFieldEnumID        UserScalarFieldEnum = "id"
 	UserScalarFieldEnumEmail     UserScalarFieldEnum = "email"
+	UserScalarFieldEnumUsername  UserScalarFieldEnum = "username"
 	UserScalarFieldEnumPassword  UserScalarFieldEnum = "password"
 	UserScalarFieldEnumBio       UserScalarFieldEnum = "bio"
 	UserScalarFieldEnumAvatar    UserScalarFieldEnum = "avatar"
@@ -424,6 +426,8 @@ type userPrismaFields = prismaFields
 const userFieldID userPrismaFields = "id"
 
 const userFieldEmail userPrismaFields = "email"
+
+const userFieldUsername userPrismaFields = "username"
 
 const userFieldPassword userPrismaFields = "password"
 
@@ -920,6 +924,7 @@ type UserModel struct {
 type InnerUser struct {
 	ID        string `json:"id"`
 	Email     string `json:"email"`
+	Username  string `json:"username"`
 	Password  string `json:"password"`
 	Bio       string `json:"bio"`
 	Avatar    string `json:"avatar"`
@@ -931,6 +936,7 @@ type InnerUser struct {
 type RawUserModel struct {
 	ID        RawString `json:"id"`
 	Email     RawString `json:"email"`
+	Username  RawString `json:"username"`
 	Password  RawString `json:"password"`
 	Bio       RawString `json:"bio"`
 	Avatar    RawString `json:"avatar"`
@@ -1303,6 +1309,12 @@ type userQuery struct {
 	// @required
 	// @unique
 	Email userQueryEmailString
+
+	// Username
+	//
+	// @required
+	// @unique
+	Username userQueryUsernameString
 
 	// Password
 	//
@@ -2085,6 +2097,353 @@ func (r userQueryEmailString) HasSuffixIfPresent(value *string) userParamUnique 
 
 func (r userQueryEmailString) Field() userPrismaFields {
 	return userFieldEmail
+}
+
+// base struct
+type userQueryUsernameString struct{}
+
+// Set the required value of Username
+func (r userQueryUsernameString) Set(value string) userWithPrismaUsernameSetParam {
+
+	return userWithPrismaUsernameSetParam{
+		data: builder.Field{
+			Name:  "username",
+			Value: value,
+		},
+	}
+
+}
+
+// Set the optional value of Username dynamically
+func (r userQueryUsernameString) SetIfPresent(value *String) userWithPrismaUsernameSetParam {
+	if value == nil {
+		return userWithPrismaUsernameSetParam{}
+	}
+
+	return r.Set(*value)
+}
+
+func (r userQueryUsernameString) Equals(value string) userWithPrismaUsernameEqualsUniqueParam {
+
+	return userWithPrismaUsernameEqualsUniqueParam{
+		data: builder.Field{
+			Name: "username",
+			Fields: []builder.Field{
+				{
+					Name:  "equals",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQueryUsernameString) EqualsIfPresent(value *string) userWithPrismaUsernameEqualsUniqueParam {
+	if value == nil {
+		return userWithPrismaUsernameEqualsUniqueParam{}
+	}
+	return r.Equals(*value)
+}
+
+func (r userQueryUsernameString) Order(direction SortOrder) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name:  "username",
+			Value: direction,
+		},
+	}
+}
+
+func (r userQueryUsernameString) Cursor(cursor string) userCursorParam {
+	return userCursorParam{
+		data: builder.Field{
+			Name:  "username",
+			Value: cursor,
+		},
+	}
+}
+
+func (r userQueryUsernameString) In(value []string) userParamUnique {
+	return userParamUnique{
+		data: builder.Field{
+			Name: "username",
+			Fields: []builder.Field{
+				{
+					Name:  "in",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQueryUsernameString) InIfPresent(value []string) userParamUnique {
+	if value == nil {
+		return userParamUnique{}
+	}
+	return r.In(value)
+}
+
+func (r userQueryUsernameString) NotIn(value []string) userParamUnique {
+	return userParamUnique{
+		data: builder.Field{
+			Name: "username",
+			Fields: []builder.Field{
+				{
+					Name:  "notIn",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQueryUsernameString) NotInIfPresent(value []string) userParamUnique {
+	if value == nil {
+		return userParamUnique{}
+	}
+	return r.NotIn(value)
+}
+
+func (r userQueryUsernameString) Lt(value string) userParamUnique {
+	return userParamUnique{
+		data: builder.Field{
+			Name: "username",
+			Fields: []builder.Field{
+				{
+					Name:  "lt",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQueryUsernameString) LtIfPresent(value *string) userParamUnique {
+	if value == nil {
+		return userParamUnique{}
+	}
+	return r.Lt(*value)
+}
+
+func (r userQueryUsernameString) Lte(value string) userParamUnique {
+	return userParamUnique{
+		data: builder.Field{
+			Name: "username",
+			Fields: []builder.Field{
+				{
+					Name:  "lte",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQueryUsernameString) LteIfPresent(value *string) userParamUnique {
+	if value == nil {
+		return userParamUnique{}
+	}
+	return r.Lte(*value)
+}
+
+func (r userQueryUsernameString) Gt(value string) userParamUnique {
+	return userParamUnique{
+		data: builder.Field{
+			Name: "username",
+			Fields: []builder.Field{
+				{
+					Name:  "gt",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQueryUsernameString) GtIfPresent(value *string) userParamUnique {
+	if value == nil {
+		return userParamUnique{}
+	}
+	return r.Gt(*value)
+}
+
+func (r userQueryUsernameString) Gte(value string) userParamUnique {
+	return userParamUnique{
+		data: builder.Field{
+			Name: "username",
+			Fields: []builder.Field{
+				{
+					Name:  "gte",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQueryUsernameString) GteIfPresent(value *string) userParamUnique {
+	if value == nil {
+		return userParamUnique{}
+	}
+	return r.Gte(*value)
+}
+
+func (r userQueryUsernameString) Contains(value string) userParamUnique {
+	return userParamUnique{
+		data: builder.Field{
+			Name: "username",
+			Fields: []builder.Field{
+				{
+					Name:  "contains",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQueryUsernameString) ContainsIfPresent(value *string) userParamUnique {
+	if value == nil {
+		return userParamUnique{}
+	}
+	return r.Contains(*value)
+}
+
+func (r userQueryUsernameString) StartsWith(value string) userParamUnique {
+	return userParamUnique{
+		data: builder.Field{
+			Name: "username",
+			Fields: []builder.Field{
+				{
+					Name:  "startsWith",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQueryUsernameString) StartsWithIfPresent(value *string) userParamUnique {
+	if value == nil {
+		return userParamUnique{}
+	}
+	return r.StartsWith(*value)
+}
+
+func (r userQueryUsernameString) EndsWith(value string) userParamUnique {
+	return userParamUnique{
+		data: builder.Field{
+			Name: "username",
+			Fields: []builder.Field{
+				{
+					Name:  "endsWith",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQueryUsernameString) EndsWithIfPresent(value *string) userParamUnique {
+	if value == nil {
+		return userParamUnique{}
+	}
+	return r.EndsWith(*value)
+}
+
+func (r userQueryUsernameString) Mode(value QueryMode) userParamUnique {
+	return userParamUnique{
+		data: builder.Field{
+			Name: "username",
+			Fields: []builder.Field{
+				{
+					Name:  "mode",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQueryUsernameString) ModeIfPresent(value *QueryMode) userParamUnique {
+	if value == nil {
+		return userParamUnique{}
+	}
+	return r.Mode(*value)
+}
+
+func (r userQueryUsernameString) Not(value string) userParamUnique {
+	return userParamUnique{
+		data: builder.Field{
+			Name: "username",
+			Fields: []builder.Field{
+				{
+					Name:  "not",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQueryUsernameString) NotIfPresent(value *string) userParamUnique {
+	if value == nil {
+		return userParamUnique{}
+	}
+	return r.Not(*value)
+}
+
+// deprecated: Use StartsWith instead.
+
+func (r userQueryUsernameString) HasPrefix(value string) userParamUnique {
+	return userParamUnique{
+		data: builder.Field{
+			Name: "username",
+			Fields: []builder.Field{
+				{
+					Name:  "starts_with",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+// deprecated: Use StartsWithIfPresent instead.
+func (r userQueryUsernameString) HasPrefixIfPresent(value *string) userParamUnique {
+	if value == nil {
+		return userParamUnique{}
+	}
+	return r.HasPrefix(*value)
+}
+
+// deprecated: Use EndsWith instead.
+
+func (r userQueryUsernameString) HasSuffix(value string) userParamUnique {
+	return userParamUnique{
+		data: builder.Field{
+			Name: "username",
+			Fields: []builder.Field{
+				{
+					Name:  "ends_with",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+// deprecated: Use EndsWithIfPresent instead.
+func (r userQueryUsernameString) HasSuffixIfPresent(value *string) userParamUnique {
+	if value == nil {
+		return userParamUnique{}
+	}
+	return r.HasSuffix(*value)
+}
+
+func (r userQueryUsernameString) Field() userPrismaFields {
+	return userFieldUsername
 }
 
 // base struct
@@ -18608,6 +18967,7 @@ type userActions struct {
 var userOutput = []builder.Output{
 	{Name: "id"},
 	{Name: "email"},
+	{Name: "username"},
 	{Name: "password"},
 	{Name: "bio"},
 	{Name: "avatar"},
@@ -18934,6 +19294,84 @@ func (p userWithPrismaEmailEqualsUniqueParam) emailField() {}
 
 func (userWithPrismaEmailEqualsUniqueParam) unique() {}
 func (userWithPrismaEmailEqualsUniqueParam) equals() {}
+
+type UserWithPrismaUsernameEqualsSetParam interface {
+	field() builder.Field
+	getQuery() builder.Query
+	equals()
+	userModel()
+	usernameField()
+}
+
+type UserWithPrismaUsernameSetParam interface {
+	field() builder.Field
+	getQuery() builder.Query
+	userModel()
+	usernameField()
+}
+
+type userWithPrismaUsernameSetParam struct {
+	data  builder.Field
+	query builder.Query
+}
+
+func (p userWithPrismaUsernameSetParam) field() builder.Field {
+	return p.data
+}
+
+func (p userWithPrismaUsernameSetParam) getQuery() builder.Query {
+	return p.query
+}
+
+func (p userWithPrismaUsernameSetParam) userModel() {}
+
+func (p userWithPrismaUsernameSetParam) usernameField() {}
+
+type UserWithPrismaUsernameWhereParam interface {
+	field() builder.Field
+	getQuery() builder.Query
+	userModel()
+	usernameField()
+}
+
+type userWithPrismaUsernameEqualsParam struct {
+	data  builder.Field
+	query builder.Query
+}
+
+func (p userWithPrismaUsernameEqualsParam) field() builder.Field {
+	return p.data
+}
+
+func (p userWithPrismaUsernameEqualsParam) getQuery() builder.Query {
+	return p.query
+}
+
+func (p userWithPrismaUsernameEqualsParam) userModel() {}
+
+func (p userWithPrismaUsernameEqualsParam) usernameField() {}
+
+func (userWithPrismaUsernameSetParam) settable()  {}
+func (userWithPrismaUsernameEqualsParam) equals() {}
+
+type userWithPrismaUsernameEqualsUniqueParam struct {
+	data  builder.Field
+	query builder.Query
+}
+
+func (p userWithPrismaUsernameEqualsUniqueParam) field() builder.Field {
+	return p.data
+}
+
+func (p userWithPrismaUsernameEqualsUniqueParam) getQuery() builder.Query {
+	return p.query
+}
+
+func (p userWithPrismaUsernameEqualsUniqueParam) userModel()     {}
+func (p userWithPrismaUsernameEqualsUniqueParam) usernameField() {}
+
+func (userWithPrismaUsernameEqualsUniqueParam) unique() {}
+func (userWithPrismaUsernameEqualsUniqueParam) equals() {}
 
 type UserWithPrismaPasswordEqualsSetParam interface {
 	field() builder.Field
@@ -22223,7 +22661,7 @@ type likeSetParam struct {
 	data builder.Field
 }
 
-func (p likeSetParam) userField() {
+func (p likeSetParam) postField() {
 	//TODO implement me
 	panic("implement me")
 }
@@ -22233,7 +22671,7 @@ func (p likeSetParam) getQuery() builder.Query {
 	panic("implement me")
 }
 
-func (p likeSetParam) postField() {
+func (p likeSetParam) userField() {
 	//TODO implement me
 	panic("implement me")
 }
@@ -24668,6 +25106,7 @@ func (restaurantWithPrismaPostsEqualsUniqueParam) equals() {}
 // Creates a single user.
 func (r userActions) CreateOne(
 	_email UserWithPrismaEmailSetParam,
+	_username UserWithPrismaUsernameSetParam,
 	_password UserWithPrismaPasswordSetParam,
 	_bio UserWithPrismaBioSetParam,
 	_avatar UserWithPrismaAvatarSetParam,
@@ -24688,6 +25127,7 @@ func (r userActions) CreateOne(
 	var fields []builder.Field
 
 	fields = append(fields, _email.field())
+	fields = append(fields, _username.field())
 	fields = append(fields, _password.field())
 	fields = append(fields, _bio.field())
 	fields = append(fields, _avatar.field())
@@ -41192,6 +41632,7 @@ func (r userActions) UpsertOne(
 func (r userUpsertOne) Create(
 
 	_email UserWithPrismaEmailSetParam,
+	_username UserWithPrismaUsernameSetParam,
 	_password UserWithPrismaPasswordSetParam,
 	_bio UserWithPrismaBioSetParam,
 	_avatar UserWithPrismaAvatarSetParam,
@@ -41205,6 +41646,7 @@ func (r userUpsertOne) Create(
 
 	var fields []builder.Field
 	fields = append(fields, _email.field())
+	fields = append(fields, _username.field())
 	fields = append(fields, _password.field())
 	fields = append(fields, _bio.field())
 	fields = append(fields, _avatar.field())

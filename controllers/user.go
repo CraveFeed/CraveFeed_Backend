@@ -3,7 +3,7 @@ package controllers
 import (
 	"cravefeed_backend/Redis/Caching"
 	database "cravefeed_backend/database"
-	helpers "cravefeed_backend/helper"
+	"cravefeed_backend/helper"
 	"cravefeed_backend/interfaces"
 	"cravefeed_backend/prisma/db"
 	"encoding/json"
@@ -40,6 +40,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) { //Removed optional fie
 
 	createdUser, err := pClient.Client.User.CreateOne(
 		db.User.Email.Set(userData.Email),
+		db.User.Username.Set(userData.Username),
 		db.User.Password.Set(userData.Password),
 		db.User.Bio.Set(userData.Bio),
 		db.User.Avatar.Set(userData.Avatar),
@@ -158,4 +159,80 @@ func HandleFollowRequest(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	helpers.WriteJSON(w, http.StatusOK, createdFollow)
+}
+
+func GetProfileBio(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	pClient := database.PClient
+	var profileData interfaces.CreateProfileRequest
+	err := json.NewDecoder(r.Body).Decode(&profileData)
+	if err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	profile, err := pClient.Client.User.FindUnique(
+		db.User.ID.Equals(profileData.Id),
+	).With(
+		db.User.Posts.Fetch(),
+		db.User.Followers.Fetch(),
+		db.User.Following.Fetch(),
+	).Exec(pClient.Context)
+
+	response := map[string]interface{}{
+		"username":      profile.Username,
+		"bio":           profile.Bio,
+		"avatar":        profile.Avatar,
+		"firstname":     profile.FirstName,
+		"lastname":      profile.LastName,
+		"noOfFollowers": len(profile.Followers()),
+		"noOfFollowing": len(profile.Following()),
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	helpers.WriteJSON(w, http.StatusOK, response)
+}
+
+func GetProfileInfo(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	pClient := database.PClient
+	var profileData interfaces.CreateProfileRequest
+	err := json.NewDecoder(r.Body).Decode(&profileData)
+	if err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	userID := profileData.Id
+
+	profile, err := pClient.Client.User.FindUnique(
+		db.User.ID.Equals(userID),
+	).With(
+		db.User.Posts.Fetch(),
+		db.User.Followers.Fetch(),
+		db.User.Following.Fetch(),
+	).Exec(pClient.Context)
+
+	if err != nil {
+		http.Error(w, "User not found", http.StatusNotFound)
+		return
+	}
+
+	response := map[string]interface{}{
+		"username":      profile.Username,
+		"bio":           profile.Bio,
+		"avatar":        profile.Avatar,
+		"firstname":     profile.FirstName,
+		"lastname":      profile.LastName,
+		"coverImage":    profile.Avatar,
+		"noOfPosts":     len(profile.Posts()),
+		"noOfFollowers": len(profile.Followers()),
+		"noOfFollowing": len(profile.Following()),
+		"userPosts":     profile.Posts,
+		"followers":     profile.Following(),
+		"following":     profile.Followers(),
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	helpers.WriteJSON(w, http.StatusOK, response)
 }
