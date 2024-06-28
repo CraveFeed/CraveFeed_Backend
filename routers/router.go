@@ -29,6 +29,8 @@ func Routes() http.Handler {
 	router.Post("/posts", controllers.GetAllPosts)
 	router.Post("/getProfileInfo", controllers.GetProfileInfo)
 	router.Post("/getProfileBio", controllers.GetProfileBio)
+	router.Post("/repostPost", controllers.Repost)
+	router.Post("/getReposts", controllers.GetReposts)
 	return router
 
 }

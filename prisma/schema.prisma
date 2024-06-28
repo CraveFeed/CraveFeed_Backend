@@ -25,22 +25,25 @@ model User {
 }
 
 model Post {
-  id           String      @id @default(cuid())
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
-  title        String
-  description  String
-  longitude    String
-  latitude     String
-  pictures     String
-  userId       String
-  city         String
-  user         User        @relation(fields: [userId], references: [id])
-  likes        Like[]
-  comments     Comment[]
-  tags         Tag[]
-  restaurantId String? // It is optional if the user add in the resturant , we will be able to search posts regarding this resturant
-  restaurant   Restaurant? @relation(fields: [restaurantId], references: [id])
+  id             String      @id @default(cuid())
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  title          String
+  description    String
+  longitude      String
+  latitude       String
+  pictures       String
+  userId         String
+  city           String
+  user           User        @relation(fields: [userId], references: [id])
+  likes          Like[]
+  comments       Comment[]
+  tags           Tag[]
+  restaurantId   String? // Optional
+  restaurant     Restaurant? @relation(fields: [restaurantId], references: [id])
+  originalPost   Post?       @relation("RepostRelation", fields: [originalPostId], references: [id])
+  originalPostId String? // For reposts, references the original post
+  repostedPosts  Post[]      @relation("RepostRelation")
 }
 
 model Comment {

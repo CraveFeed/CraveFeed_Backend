@@ -14,6 +14,11 @@ type CreateProfileRequest struct {
 	Id string `json:"id"`
 }
 
+type RepostRequest struct {
+	PostID string `json:"postId"`
+	UserID string `json:"userId"`
+}
+
 type CreatePostRequest struct {
 	Title       string `json:"title"`
 	Description string `json:"description"`

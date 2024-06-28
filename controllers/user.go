@@ -146,17 +146,14 @@ func HandleFollowRequest(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
-
 	createdFollow, err := pClient.Client.Follows.CreateOne(
 		db.Follows.FollowerID.Set(followReq.FollowerID),
 		db.Follows.FollowingID.Set(followReq.FollowingID),
 	).Exec(pClient.Context)
-
 	if err != nil {
 		http.Error(w, "Failed to create follow", http.StatusInternalServerError)
 		return
 	}
-
 	w.Header().Set("Content-Type", "application/json")
 	helpers.WriteJSON(w, http.StatusOK, createdFollow)
 }
@@ -164,13 +161,10 @@ func HandleFollowRequest(w http.ResponseWriter, r *http.Request) {
 func GetProfileBio(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	pClient := database.PClient
-	var profileData interfaces.CreateProfileRequest
-	err := json.NewDecoder(r.Body).Decode(&profileData)
-	if err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
-		return
+	query := r.URL.Query()
+	profileData := interfaces.CreateProfileRequest{
+		Id: query.Get("id"),
 	}
-
 	profile, err := pClient.Client.User.FindUnique(
 		db.User.ID.Equals(profileData.Id),
 	).With(
@@ -178,7 +172,11 @@ func GetProfileBio(w http.ResponseWriter, r *http.Request) {
 		db.User.Followers.Fetch(),
 		db.User.Following.Fetch(),
 	).Exec(pClient.Context)
+	if err != nil {
+		http.Error(w, "User not found", http.StatusNotFound)
+		return
 
+	}
 	response := map[string]interface{}{
 		"username":      profile.Username,
 		"bio":           profile.Bio,
@@ -202,9 +200,7 @@ func GetProfileInfo(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
-
 	userID := profileData.Id
-
 	profile, err := pClient.Client.User.FindUnique(
 		db.User.ID.Equals(userID),
 	).With(
@@ -212,12 +208,10 @@ func GetProfileInfo(w http.ResponseWriter, r *http.Request) {
 		db.User.Followers.Fetch(),
 		db.User.Following.Fetch(),
 	).Exec(pClient.Context)
-
 	if err != nil {
 		http.Error(w, "User not found", http.StatusNotFound)
 		return
 	}
-
 	response := map[string]interface{}{
 		"username":      profile.Username,
 		"bio":           profile.Bio,
@@ -232,7 +226,57 @@ func GetProfileInfo(w http.ResponseWriter, r *http.Request) {
 		"followers":     profile.Following(),
 		"following":     profile.Followers(),
 	}
-
 	w.Header().Set("Content-Type", "application/json")
 	helpers.WriteJSON(w, http.StatusOK, response)
+}
+
+func Repost(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	pClient := database.PClient
+	var repostData interfaces.RepostRequest
+	err := json.NewDecoder(r.Body).Decode(&repostData)
+	if err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+	userID := repostData.UserID
+	originalPostID := repostData.PostID
+	originalPost, err := pClient.Client.Post.FindUnique(
+		db.Post.ID.Equals(originalPostID),
+	).Exec(pClient.Context)
+	if err != nil {
+		http.Error(w, "Original post not found", http.StatusNotFound)
+		return
+	}
+	newPost, err := pClient.Client.Post.CreateOne(
+		db.Post.UserID.Set(userID),
+		db.Post.Title.Set("Repost: "+originalPost.Title),
+		db.Post.Description.Set(originalPost.Description),
+		db.Post.Longitude.Set(originalPost.Longitude),
+		db.Post.Latitude.Set(originalPost.Latitude),
+		db.Post.Pictures.Set(originalPost.Pictures),
+		db.Post.City.Set(originalPost.City),
+		db.Post.OriginalPostID.Set(originalPostID),
+	).Exec(pClient.Context)
+	if err != nil {
+		http.Error(w, "Failed to create repost", http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	helpers.WriteJSON(w, http.StatusOK, newPost)
+}
+
+func GetReposts(w http.ResponseWriter, r *http.Request) {
+	pClient := database.PClient
+	query := r.URL.Query()
+	postId := query.Get("postId")
+	reposts, err := pClient.Client.Post.FindMany(
+		db.Post.OriginalPostID.Equals(postId),
+	).Exec(pClient.Context)
+	if err != nil {
+		http.Error(w, "Failed to fetch reposts", http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	helpers.WriteJSON(w, http.StatusOK, reposts)
 }

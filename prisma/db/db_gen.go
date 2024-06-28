@@ -99,22 +99,25 @@ model User {
 }
 
 model Post {
-  id           String      @id @default(cuid())
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
-  title        String
-  description  String
-  longitude    String
-  latitude     String
-  pictures     String
-  userId       String
-  city         String
-  user         User        @relation(fields: [userId], references: [id])
-  likes        Like[]
-  comments     Comment[]
-  tags         Tag[]
-  restaurantId String? // It is optional if the user add in the resturant , we will be able to search posts regarding this resturant
-  restaurant   Restaurant? @relation(fields: [restaurantId], references: [id])
+  id             String      @id @default(cuid())
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  title          String
+  description    String
+  longitude      String
+  latitude       String
+  pictures       String
+  userId         String
+  city           String
+  user           User        @relation(fields: [userId], references: [id])
+  likes          Like[]
+  comments       Comment[]
+  tags           Tag[]
+  restaurantId   String? // Optional
+  restaurant     Restaurant? @relation(fields: [restaurantId], references: [id])
+  originalPost   Post?       @relation("RepostRelation", fields: [originalPostId], references: [id])
+  originalPostId String? // For reposts, references the original post
+  repostedPosts  Post[]      @relation("RepostRelation")
 }
 
 model Comment {
@@ -308,17 +311,18 @@ const (
 type PostScalarFieldEnum string
 
 const (
-	PostScalarFieldEnumID           PostScalarFieldEnum = "id"
-	PostScalarFieldEnumCreatedAt    PostScalarFieldEnum = "createdAt"
-	PostScalarFieldEnumUpdatedAt    PostScalarFieldEnum = "updatedAt"
-	PostScalarFieldEnumTitle        PostScalarFieldEnum = "title"
-	PostScalarFieldEnumDescription  PostScalarFieldEnum = "description"
-	PostScalarFieldEnumLongitude    PostScalarFieldEnum = "longitude"
-	PostScalarFieldEnumLatitude     PostScalarFieldEnum = "latitude"
-	PostScalarFieldEnumPictures     PostScalarFieldEnum = "pictures"
-	PostScalarFieldEnumUserID       PostScalarFieldEnum = "userId"
-	PostScalarFieldEnumCity         PostScalarFieldEnum = "city"
-	PostScalarFieldEnumRestaurantID PostScalarFieldEnum = "restaurantId"
+	PostScalarFieldEnumID             PostScalarFieldEnum = "id"
+	PostScalarFieldEnumCreatedAt      PostScalarFieldEnum = "createdAt"
+	PostScalarFieldEnumUpdatedAt      PostScalarFieldEnum = "updatedAt"
+	PostScalarFieldEnumTitle          PostScalarFieldEnum = "title"
+	PostScalarFieldEnumDescription    PostScalarFieldEnum = "description"
+	PostScalarFieldEnumLongitude      PostScalarFieldEnum = "longitude"
+	PostScalarFieldEnumLatitude       PostScalarFieldEnum = "latitude"
+	PostScalarFieldEnumPictures       PostScalarFieldEnum = "pictures"
+	PostScalarFieldEnumUserID         PostScalarFieldEnum = "userId"
+	PostScalarFieldEnumCity           PostScalarFieldEnum = "city"
+	PostScalarFieldEnumRestaurantID   PostScalarFieldEnum = "restaurantId"
+	PostScalarFieldEnumOriginalPostID PostScalarFieldEnum = "originalPostId"
 )
 
 type CommentScalarFieldEnum string
@@ -484,6 +488,12 @@ const postFieldTags postPrismaFields = "tags"
 const postFieldRestaurantID postPrismaFields = "restaurantId"
 
 const postFieldRestaurant postPrismaFields = "restaurant"
+
+const postFieldOriginalPost postPrismaFields = "originalPost"
+
+const postFieldOriginalPostID postPrismaFields = "originalPostId"
+
+const postFieldRepostedPosts postPrismaFields = "repostedPosts"
 
 type commentPrismaFields = prismaFields
 
@@ -1004,41 +1014,45 @@ type PostModel struct {
 
 // InnerPost holds the actual data
 type InnerPost struct {
-	ID           string   `json:"id"`
-	CreatedAt    DateTime `json:"createdAt"`
-	UpdatedAt    DateTime `json:"updatedAt"`
-	Title        string   `json:"title"`
-	Description  string   `json:"description"`
-	Longitude    string   `json:"longitude"`
-	Latitude     string   `json:"latitude"`
-	Pictures     string   `json:"pictures"`
-	UserID       string   `json:"userId"`
-	City         string   `json:"city"`
-	RestaurantID *string  `json:"restaurantId,omitempty"`
+	ID             string   `json:"id"`
+	CreatedAt      DateTime `json:"createdAt"`
+	UpdatedAt      DateTime `json:"updatedAt"`
+	Title          string   `json:"title"`
+	Description    string   `json:"description"`
+	Longitude      string   `json:"longitude"`
+	Latitude       string   `json:"latitude"`
+	Pictures       string   `json:"pictures"`
+	UserID         string   `json:"userId"`
+	City           string   `json:"city"`
+	RestaurantID   *string  `json:"restaurantId,omitempty"`
+	OriginalPostID *string  `json:"originalPostId,omitempty"`
 }
 
 // RawPostModel is a struct for Post when used in raw queries
 type RawPostModel struct {
-	ID           RawString   `json:"id"`
-	CreatedAt    RawDateTime `json:"createdAt"`
-	UpdatedAt    RawDateTime `json:"updatedAt"`
-	Title        RawString   `json:"title"`
-	Description  RawString   `json:"description"`
-	Longitude    RawString   `json:"longitude"`
-	Latitude     RawString   `json:"latitude"`
-	Pictures     RawString   `json:"pictures"`
-	UserID       RawString   `json:"userId"`
-	City         RawString   `json:"city"`
-	RestaurantID *RawString  `json:"restaurantId,omitempty"`
+	ID             RawString   `json:"id"`
+	CreatedAt      RawDateTime `json:"createdAt"`
+	UpdatedAt      RawDateTime `json:"updatedAt"`
+	Title          RawString   `json:"title"`
+	Description    RawString   `json:"description"`
+	Longitude      RawString   `json:"longitude"`
+	Latitude       RawString   `json:"latitude"`
+	Pictures       RawString   `json:"pictures"`
+	UserID         RawString   `json:"userId"`
+	City           RawString   `json:"city"`
+	RestaurantID   *RawString  `json:"restaurantId,omitempty"`
+	OriginalPostID *RawString  `json:"originalPostId,omitempty"`
 }
 
 // RelationsPost holds the relation data separately
 type RelationsPost struct {
-	User       *UserModel       `json:"user,omitempty"`
-	Likes      []LikeModel      `json:"likes,omitempty"`
-	Comments   []CommentModel   `json:"comments,omitempty"`
-	Tags       []TagModel       `json:"tags,omitempty"`
-	Restaurant *RestaurantModel `json:"restaurant,omitempty"`
+	User          *UserModel       `json:"user,omitempty"`
+	Likes         []LikeModel      `json:"likes,omitempty"`
+	Comments      []CommentModel   `json:"comments,omitempty"`
+	Tags          []TagModel       `json:"tags,omitempty"`
+	Restaurant    *RestaurantModel `json:"restaurant,omitempty"`
+	OriginalPost  *PostModel       `json:"originalPost,omitempty"`
+	RepostedPosts []PostModel      `json:"repostedPosts,omitempty"`
 }
 
 func (r PostModel) User() (value *UserModel) {
@@ -1081,6 +1095,27 @@ func (r PostModel) Restaurant() (value *RestaurantModel, ok bool) {
 		return value, false
 	}
 	return r.RelationsPost.Restaurant, true
+}
+
+func (r PostModel) OriginalPost() (value *PostModel, ok bool) {
+	if r.RelationsPost.OriginalPost == nil {
+		return value, false
+	}
+	return r.RelationsPost.OriginalPost, true
+}
+
+func (r PostModel) OriginalPostID() (value String, ok bool) {
+	if r.InnerPost.OriginalPostID == nil {
+		return value, false
+	}
+	return *r.InnerPost.OriginalPostID, true
+}
+
+func (r PostModel) RepostedPosts() (value []PostModel) {
+	if r.RelationsPost.RepostedPosts == nil {
+		panic("attempted to access repostedPosts but did not fetch it using the .With() syntax")
+	}
+	return r.RelationsPost.RepostedPosts
 }
 
 // CommentModel represents the Comment model and is a wrapper for accessing fields and methods
@@ -5283,6 +5318,15 @@ type postQuery struct {
 	RestaurantID postQueryRestaurantIDString
 
 	Restaurant postQueryRestaurantRelations
+
+	OriginalPost postQueryOriginalPostRelations
+
+	// OriginalPostID
+	//
+	// @optional
+	OriginalPostID postQueryOriginalPostIDString
+
+	RepostedPosts postQueryRepostedPostsRelations
 }
 
 func (postQuery) Not(params ...PostWhereParam) postDefaultParam {
@@ -9816,6 +9860,658 @@ func (r postQueryRestaurantRelations) Unlink() postSetParam {
 
 func (r postQueryRestaurantRestaurant) Field() postPrismaFields {
 	return postFieldRestaurant
+}
+
+// base struct
+type postQueryOriginalPostPost struct{}
+
+type postQueryOriginalPostRelations struct{}
+
+// Post -> OriginalPost
+//
+// @relation
+// @optional
+func (postQueryOriginalPostRelations) Where(
+	params ...PostWhereParam,
+) postDefaultParam {
+	var fields []builder.Field
+
+	for _, q := range params {
+		fields = append(fields, q.field())
+	}
+
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "originalPost",
+			Fields: []builder.Field{
+				{
+					Name:   "is",
+					Fields: fields,
+				},
+			},
+		},
+	}
+}
+
+func (postQueryOriginalPostRelations) Fetch() postToOriginalPostFindUnique {
+	var v postToOriginalPostFindUnique
+
+	v.query.Operation = "query"
+	v.query.Method = "originalPost"
+	v.query.Outputs = postOutput
+
+	return v
+}
+
+func (r postQueryOriginalPostRelations) Link(
+	params PostWhereParam,
+) postSetParam {
+	var fields []builder.Field
+
+	f := params.field()
+	if f.Fields == nil && f.Value == nil {
+		return postSetParam{}
+	}
+
+	fields = append(fields, f)
+
+	return postSetParam{
+		data: builder.Field{
+			Name: "originalPost",
+			Fields: []builder.Field{
+				{
+					Name:   "connect",
+					Fields: builder.TransformEquals(fields),
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryOriginalPostRelations) Unlink() postSetParam {
+	var v postSetParam
+
+	v = postSetParam{
+		data: builder.Field{
+			Name: "originalPost",
+			Fields: []builder.Field{
+				{
+					Name:  "disconnect",
+					Value: true,
+				},
+			},
+		},
+	}
+
+	return v
+}
+
+func (r postQueryOriginalPostPost) Field() postPrismaFields {
+	return postFieldOriginalPost
+}
+
+// base struct
+type postQueryOriginalPostIDString struct{}
+
+// Set the optional value of OriginalPostID
+func (r postQueryOriginalPostIDString) Set(value string) postSetParam {
+
+	return postSetParam{
+		data: builder.Field{
+			Name:  "originalPostId",
+			Value: value,
+		},
+	}
+
+}
+
+// Set the optional value of OriginalPostID dynamically
+func (r postQueryOriginalPostIDString) SetIfPresent(value *String) postSetParam {
+	if value == nil {
+		return postSetParam{}
+	}
+
+	return r.Set(*value)
+}
+
+// Set the optional value of OriginalPostID dynamically
+func (r postQueryOriginalPostIDString) SetOptional(value *String) postSetParam {
+	if value == nil {
+
+		var v *string
+		return postSetParam{
+			data: builder.Field{
+				Name:  "originalPostId",
+				Value: v,
+			},
+		}
+	}
+
+	return r.Set(*value)
+}
+
+func (r postQueryOriginalPostIDString) Equals(value string) postWithPrismaOriginalPostIDEqualsParam {
+
+	return postWithPrismaOriginalPostIDEqualsParam{
+		data: builder.Field{
+			Name: "originalPostId",
+			Fields: []builder.Field{
+				{
+					Name:  "equals",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryOriginalPostIDString) EqualsIfPresent(value *string) postWithPrismaOriginalPostIDEqualsParam {
+	if value == nil {
+		return postWithPrismaOriginalPostIDEqualsParam{}
+	}
+	return r.Equals(*value)
+}
+
+func (r postQueryOriginalPostIDString) EqualsOptional(value *String) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "originalPostId",
+			Fields: []builder.Field{
+				{
+					Name:  "equals",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryOriginalPostIDString) IsNull() postDefaultParam {
+	var str *string = nil
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "originalPostId",
+			Fields: []builder.Field{
+				{
+					Name:  "equals",
+					Value: str,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryOriginalPostIDString) Order(direction SortOrder) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name:  "originalPostId",
+			Value: direction,
+		},
+	}
+}
+
+func (r postQueryOriginalPostIDString) Cursor(cursor string) postCursorParam {
+	return postCursorParam{
+		data: builder.Field{
+			Name:  "originalPostId",
+			Value: cursor,
+		},
+	}
+}
+
+func (r postQueryOriginalPostIDString) In(value []string) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "originalPostId",
+			Fields: []builder.Field{
+				{
+					Name:  "in",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryOriginalPostIDString) InIfPresent(value []string) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.In(value)
+}
+
+func (r postQueryOriginalPostIDString) NotIn(value []string) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "originalPostId",
+			Fields: []builder.Field{
+				{
+					Name:  "notIn",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryOriginalPostIDString) NotInIfPresent(value []string) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.NotIn(value)
+}
+
+func (r postQueryOriginalPostIDString) Lt(value string) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "originalPostId",
+			Fields: []builder.Field{
+				{
+					Name:  "lt",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryOriginalPostIDString) LtIfPresent(value *string) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.Lt(*value)
+}
+
+func (r postQueryOriginalPostIDString) Lte(value string) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "originalPostId",
+			Fields: []builder.Field{
+				{
+					Name:  "lte",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryOriginalPostIDString) LteIfPresent(value *string) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.Lte(*value)
+}
+
+func (r postQueryOriginalPostIDString) Gt(value string) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "originalPostId",
+			Fields: []builder.Field{
+				{
+					Name:  "gt",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryOriginalPostIDString) GtIfPresent(value *string) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.Gt(*value)
+}
+
+func (r postQueryOriginalPostIDString) Gte(value string) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "originalPostId",
+			Fields: []builder.Field{
+				{
+					Name:  "gte",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryOriginalPostIDString) GteIfPresent(value *string) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.Gte(*value)
+}
+
+func (r postQueryOriginalPostIDString) Contains(value string) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "originalPostId",
+			Fields: []builder.Field{
+				{
+					Name:  "contains",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryOriginalPostIDString) ContainsIfPresent(value *string) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.Contains(*value)
+}
+
+func (r postQueryOriginalPostIDString) StartsWith(value string) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "originalPostId",
+			Fields: []builder.Field{
+				{
+					Name:  "startsWith",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryOriginalPostIDString) StartsWithIfPresent(value *string) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.StartsWith(*value)
+}
+
+func (r postQueryOriginalPostIDString) EndsWith(value string) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "originalPostId",
+			Fields: []builder.Field{
+				{
+					Name:  "endsWith",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryOriginalPostIDString) EndsWithIfPresent(value *string) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.EndsWith(*value)
+}
+
+func (r postQueryOriginalPostIDString) Mode(value QueryMode) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "originalPostId",
+			Fields: []builder.Field{
+				{
+					Name:  "mode",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryOriginalPostIDString) ModeIfPresent(value *QueryMode) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.Mode(*value)
+}
+
+func (r postQueryOriginalPostIDString) Not(value string) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "originalPostId",
+			Fields: []builder.Field{
+				{
+					Name:  "not",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryOriginalPostIDString) NotIfPresent(value *string) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.Not(*value)
+}
+
+// deprecated: Use StartsWith instead.
+
+func (r postQueryOriginalPostIDString) HasPrefix(value string) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "originalPostId",
+			Fields: []builder.Field{
+				{
+					Name:  "starts_with",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+// deprecated: Use StartsWithIfPresent instead.
+func (r postQueryOriginalPostIDString) HasPrefixIfPresent(value *string) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.HasPrefix(*value)
+}
+
+// deprecated: Use EndsWith instead.
+
+func (r postQueryOriginalPostIDString) HasSuffix(value string) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "originalPostId",
+			Fields: []builder.Field{
+				{
+					Name:  "ends_with",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+// deprecated: Use EndsWithIfPresent instead.
+func (r postQueryOriginalPostIDString) HasSuffixIfPresent(value *string) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.HasSuffix(*value)
+}
+
+func (r postQueryOriginalPostIDString) Field() postPrismaFields {
+	return postFieldOriginalPostID
+}
+
+// base struct
+type postQueryRepostedPostsPost struct{}
+
+type postQueryRepostedPostsRelations struct{}
+
+// Post -> RepostedPosts
+//
+// @relation
+// @required
+func (postQueryRepostedPostsRelations) Some(
+	params ...PostWhereParam,
+) postDefaultParam {
+	var fields []builder.Field
+
+	for _, q := range params {
+		fields = append(fields, q.field())
+	}
+
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "repostedPosts",
+			Fields: []builder.Field{
+				{
+					Name:   "some",
+					Fields: fields,
+				},
+			},
+		},
+	}
+}
+
+// Post -> RepostedPosts
+//
+// @relation
+// @required
+func (postQueryRepostedPostsRelations) Every(
+	params ...PostWhereParam,
+) postDefaultParam {
+	var fields []builder.Field
+
+	for _, q := range params {
+		fields = append(fields, q.field())
+	}
+
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "repostedPosts",
+			Fields: []builder.Field{
+				{
+					Name:   "every",
+					Fields: fields,
+				},
+			},
+		},
+	}
+}
+
+// Post -> RepostedPosts
+//
+// @relation
+// @required
+func (postQueryRepostedPostsRelations) None(
+	params ...PostWhereParam,
+) postDefaultParam {
+	var fields []builder.Field
+
+	for _, q := range params {
+		fields = append(fields, q.field())
+	}
+
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "repostedPosts",
+			Fields: []builder.Field{
+				{
+					Name:   "none",
+					Fields: fields,
+				},
+			},
+		},
+	}
+}
+
+func (postQueryRepostedPostsRelations) Fetch(
+
+	params ...PostWhereParam,
+
+) postToRepostedPostsFindMany {
+	var v postToRepostedPostsFindMany
+
+	v.query.Operation = "query"
+	v.query.Method = "repostedPosts"
+	v.query.Outputs = postOutput
+
+	var where []builder.Field
+	for _, q := range params {
+		if query := q.getQuery(); query.Operation != "" {
+			v.query.Outputs = append(v.query.Outputs, builder.Output{
+				Name:    query.Method,
+				Inputs:  query.Inputs,
+				Outputs: query.Outputs,
+			})
+		} else {
+			where = append(where, q.field())
+		}
+	}
+
+	if len(where) > 0 {
+		v.query.Inputs = append(v.query.Inputs, builder.Input{
+			Name:   "where",
+			Fields: where,
+		})
+	}
+
+	return v
+}
+
+func (r postQueryRepostedPostsRelations) Link(
+	params ...PostWhereParam,
+) postSetParam {
+	var fields []builder.Field
+
+	for _, q := range params {
+		fields = append(fields, q.field())
+	}
+
+	return postSetParam{
+		data: builder.Field{
+			Name: "repostedPosts",
+			Fields: []builder.Field{
+				{
+					Name:   "connect",
+					Fields: builder.TransformEquals(fields),
+
+					List:     true,
+					WrapList: true,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryRepostedPostsRelations) Unlink(
+	params ...PostWhereParam,
+) postSetParam {
+	var v postSetParam
+
+	var fields []builder.Field
+	for _, q := range params {
+		fields = append(fields, q.field())
+	}
+	v = postSetParam{
+		data: builder.Field{
+			Name: "repostedPosts",
+			Fields: []builder.Field{
+				{
+					Name:     "disconnect",
+					List:     true,
+					WrapList: true,
+					Fields:   builder.TransformEquals(fields),
+				},
+			},
+		},
+	}
+
+	return v
+}
+
+func (r postQueryRepostedPostsPost) Field() postPrismaFields {
+	return postFieldRepostedPosts
 }
 
 // Comment acts as a namespaces to access query methods for the Comment model
@@ -20248,6 +20944,7 @@ var postOutput = []builder.Output{
 	{Name: "userId"},
 	{Name: "city"},
 	{Name: "restaurantId"},
+	{Name: "originalPostId"},
 }
 
 type PostRelationWith interface {
@@ -20406,12 +21103,17 @@ type postSetParam struct {
 	data builder.Field
 }
 
+func (p postSetParam) cityField() {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (p postSetParam) getQuery() builder.Query {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (p postSetParam) cityField() {
+func (p postSetParam) titleField() {
 	//TODO implement me
 	panic("implement me")
 }
@@ -20678,6 +21380,11 @@ type postWithPrismaTitleSetParam struct {
 	query builder.Query
 }
 
+func (p postWithPrismaTitleSetParam) descriptionField() {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (p postWithPrismaTitleSetParam) field() builder.Field {
 	return p.data
 }
@@ -20754,6 +21461,11 @@ type PostWithPrismaDescriptionSetParam interface {
 type postWithPrismaDescriptionSetParam struct {
 	data  builder.Field
 	query builder.Query
+}
+
+func (p postWithPrismaDescriptionSetParam) longitudeField() {
+	//TODO implement me
+	panic("implement me")
 }
 
 func (p postWithPrismaDescriptionSetParam) field() builder.Field {
@@ -20834,6 +21546,11 @@ type postWithPrismaLongitudeSetParam struct {
 	query builder.Query
 }
 
+func (p postWithPrismaLongitudeSetParam) latitudeField() {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (p postWithPrismaLongitudeSetParam) field() builder.Field {
 	return p.data
 }
@@ -20912,6 +21629,11 @@ type postWithPrismaLatitudeSetParam struct {
 	query builder.Query
 }
 
+func (p postWithPrismaLatitudeSetParam) picturesField() {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (p postWithPrismaLatitudeSetParam) field() builder.Field {
 	return p.data
 }
@@ -20988,6 +21710,11 @@ type PostWithPrismaPicturesSetParam interface {
 type postWithPrismaPicturesSetParam struct {
 	data  builder.Field
 	query builder.Query
+}
+
+func (p postWithPrismaPicturesSetParam) cityField() {
+	//TODO implement me
+	panic("implement me")
 }
 
 func (p postWithPrismaPicturesSetParam) field() builder.Field {
@@ -21676,6 +22403,240 @@ func (p postWithPrismaRestaurantEqualsUniqueParam) restaurantField() {}
 
 func (postWithPrismaRestaurantEqualsUniqueParam) unique() {}
 func (postWithPrismaRestaurantEqualsUniqueParam) equals() {}
+
+type PostWithPrismaOriginalPostEqualsSetParam interface {
+	field() builder.Field
+	getQuery() builder.Query
+	equals()
+	postModel()
+	originalPostField()
+}
+
+type PostWithPrismaOriginalPostSetParam interface {
+	field() builder.Field
+	getQuery() builder.Query
+	postModel()
+	originalPostField()
+}
+
+type postWithPrismaOriginalPostSetParam struct {
+	data  builder.Field
+	query builder.Query
+}
+
+func (p postWithPrismaOriginalPostSetParam) field() builder.Field {
+	return p.data
+}
+
+func (p postWithPrismaOriginalPostSetParam) getQuery() builder.Query {
+	return p.query
+}
+
+func (p postWithPrismaOriginalPostSetParam) postModel() {}
+
+func (p postWithPrismaOriginalPostSetParam) originalPostField() {}
+
+type PostWithPrismaOriginalPostWhereParam interface {
+	field() builder.Field
+	getQuery() builder.Query
+	postModel()
+	originalPostField()
+}
+
+type postWithPrismaOriginalPostEqualsParam struct {
+	data  builder.Field
+	query builder.Query
+}
+
+func (p postWithPrismaOriginalPostEqualsParam) field() builder.Field {
+	return p.data
+}
+
+func (p postWithPrismaOriginalPostEqualsParam) getQuery() builder.Query {
+	return p.query
+}
+
+func (p postWithPrismaOriginalPostEqualsParam) postModel() {}
+
+func (p postWithPrismaOriginalPostEqualsParam) originalPostField() {}
+
+func (postWithPrismaOriginalPostSetParam) settable()  {}
+func (postWithPrismaOriginalPostEqualsParam) equals() {}
+
+type postWithPrismaOriginalPostEqualsUniqueParam struct {
+	data  builder.Field
+	query builder.Query
+}
+
+func (p postWithPrismaOriginalPostEqualsUniqueParam) field() builder.Field {
+	return p.data
+}
+
+func (p postWithPrismaOriginalPostEqualsUniqueParam) getQuery() builder.Query {
+	return p.query
+}
+
+func (p postWithPrismaOriginalPostEqualsUniqueParam) postModel()         {}
+func (p postWithPrismaOriginalPostEqualsUniqueParam) originalPostField() {}
+
+func (postWithPrismaOriginalPostEqualsUniqueParam) unique() {}
+func (postWithPrismaOriginalPostEqualsUniqueParam) equals() {}
+
+type PostWithPrismaOriginalPostIDEqualsSetParam interface {
+	field() builder.Field
+	getQuery() builder.Query
+	equals()
+	postModel()
+	originalPostIDField()
+}
+
+type PostWithPrismaOriginalPostIDSetParam interface {
+	field() builder.Field
+	getQuery() builder.Query
+	postModel()
+	originalPostIDField()
+}
+
+type postWithPrismaOriginalPostIDSetParam struct {
+	data  builder.Field
+	query builder.Query
+}
+
+func (p postWithPrismaOriginalPostIDSetParam) field() builder.Field {
+	return p.data
+}
+
+func (p postWithPrismaOriginalPostIDSetParam) getQuery() builder.Query {
+	return p.query
+}
+
+func (p postWithPrismaOriginalPostIDSetParam) postModel() {}
+
+func (p postWithPrismaOriginalPostIDSetParam) originalPostIDField() {}
+
+type PostWithPrismaOriginalPostIDWhereParam interface {
+	field() builder.Field
+	getQuery() builder.Query
+	postModel()
+	originalPostIDField()
+}
+
+type postWithPrismaOriginalPostIDEqualsParam struct {
+	data  builder.Field
+	query builder.Query
+}
+
+func (p postWithPrismaOriginalPostIDEqualsParam) field() builder.Field {
+	return p.data
+}
+
+func (p postWithPrismaOriginalPostIDEqualsParam) getQuery() builder.Query {
+	return p.query
+}
+
+func (p postWithPrismaOriginalPostIDEqualsParam) postModel() {}
+
+func (p postWithPrismaOriginalPostIDEqualsParam) originalPostIDField() {}
+
+func (postWithPrismaOriginalPostIDSetParam) settable()  {}
+func (postWithPrismaOriginalPostIDEqualsParam) equals() {}
+
+type postWithPrismaOriginalPostIDEqualsUniqueParam struct {
+	data  builder.Field
+	query builder.Query
+}
+
+func (p postWithPrismaOriginalPostIDEqualsUniqueParam) field() builder.Field {
+	return p.data
+}
+
+func (p postWithPrismaOriginalPostIDEqualsUniqueParam) getQuery() builder.Query {
+	return p.query
+}
+
+func (p postWithPrismaOriginalPostIDEqualsUniqueParam) postModel()           {}
+func (p postWithPrismaOriginalPostIDEqualsUniqueParam) originalPostIDField() {}
+
+func (postWithPrismaOriginalPostIDEqualsUniqueParam) unique() {}
+func (postWithPrismaOriginalPostIDEqualsUniqueParam) equals() {}
+
+type PostWithPrismaRepostedPostsEqualsSetParam interface {
+	field() builder.Field
+	getQuery() builder.Query
+	equals()
+	postModel()
+	repostedPostsField()
+}
+
+type PostWithPrismaRepostedPostsSetParam interface {
+	field() builder.Field
+	getQuery() builder.Query
+	postModel()
+	repostedPostsField()
+}
+
+type postWithPrismaRepostedPostsSetParam struct {
+	data  builder.Field
+	query builder.Query
+}
+
+func (p postWithPrismaRepostedPostsSetParam) field() builder.Field {
+	return p.data
+}
+
+func (p postWithPrismaRepostedPostsSetParam) getQuery() builder.Query {
+	return p.query
+}
+
+func (p postWithPrismaRepostedPostsSetParam) postModel() {}
+
+func (p postWithPrismaRepostedPostsSetParam) repostedPostsField() {}
+
+type PostWithPrismaRepostedPostsWhereParam interface {
+	field() builder.Field
+	getQuery() builder.Query
+	postModel()
+	repostedPostsField()
+}
+
+type postWithPrismaRepostedPostsEqualsParam struct {
+	data  builder.Field
+	query builder.Query
+}
+
+func (p postWithPrismaRepostedPostsEqualsParam) field() builder.Field {
+	return p.data
+}
+
+func (p postWithPrismaRepostedPostsEqualsParam) getQuery() builder.Query {
+	return p.query
+}
+
+func (p postWithPrismaRepostedPostsEqualsParam) postModel() {}
+
+func (p postWithPrismaRepostedPostsEqualsParam) repostedPostsField() {}
+
+func (postWithPrismaRepostedPostsSetParam) settable()  {}
+func (postWithPrismaRepostedPostsEqualsParam) equals() {}
+
+type postWithPrismaRepostedPostsEqualsUniqueParam struct {
+	data  builder.Field
+	query builder.Query
+}
+
+func (p postWithPrismaRepostedPostsEqualsUniqueParam) field() builder.Field {
+	return p.data
+}
+
+func (p postWithPrismaRepostedPostsEqualsUniqueParam) getQuery() builder.Query {
+	return p.query
+}
+
+func (p postWithPrismaRepostedPostsEqualsUniqueParam) postModel()          {}
+func (p postWithPrismaRepostedPostsEqualsUniqueParam) repostedPostsField() {}
+
+func (postWithPrismaRepostedPostsEqualsUniqueParam) unique() {}
+func (postWithPrismaRepostedPostsEqualsUniqueParam) equals() {}
 
 type commentActions struct {
 	// client holds the prisma client
@@ -22661,7 +23622,7 @@ type likeSetParam struct {
 	data builder.Field
 }
 
-func (p likeSetParam) postField() {
+func (p likeSetParam) userField() {
 	//TODO implement me
 	panic("implement me")
 }
@@ -22671,7 +23632,7 @@ func (p likeSetParam) getQuery() builder.Query {
 	panic("implement me")
 }
 
-func (p likeSetParam) userField() {
+func (p likeSetParam) postField() {
 	//TODO implement me
 	panic("implement me")
 }
@@ -32361,6 +33322,1114 @@ func (r postToRestaurantDeleteMany) Exec(ctx context.Context) (*BatchResult, err
 }
 
 func (r postToRestaurantDeleteMany) Tx() PostManyTxResult {
+	v := newPostManyTxResult()
+	v.query = r.query
+	v.query.TxResult = make(chan []byte, 1)
+	return v
+}
+
+type postToOriginalPostFindUnique struct {
+	query builder.Query
+}
+
+func (r postToOriginalPostFindUnique) getQuery() builder.Query {
+	return r.query
+}
+
+func (r postToOriginalPostFindUnique) ExtractQuery() builder.Query {
+	return r.query
+}
+
+func (r postToOriginalPostFindUnique) with()         {}
+func (r postToOriginalPostFindUnique) postModel()    {}
+func (r postToOriginalPostFindUnique) postRelation() {}
+
+func (r postToOriginalPostFindUnique) With(params ...PostRelationWith) postToOriginalPostFindUnique {
+	for _, q := range params {
+		query := q.getQuery()
+		r.query.Outputs = append(r.query.Outputs, builder.Output{
+			Name:    query.Method,
+			Inputs:  query.Inputs,
+			Outputs: query.Outputs,
+		})
+	}
+
+	return r
+}
+
+func (r postToOriginalPostFindUnique) Select(params ...postPrismaFields) postToOriginalPostFindUnique {
+	var outputs []builder.Output
+
+	for _, param := range params {
+		outputs = append(outputs, builder.Output{
+			Name: string(param),
+		})
+	}
+
+	r.query.Outputs = outputs
+
+	return r
+}
+
+func (r postToOriginalPostFindUnique) Omit(params ...postPrismaFields) postToOriginalPostFindUnique {
+	var outputs []builder.Output
+
+	var raw []string
+	for _, param := range params {
+		raw = append(raw, string(param))
+	}
+
+	for _, output := range postOutput {
+		if !slices.Contains(raw, output.Name) {
+			outputs = append(outputs, output)
+		}
+	}
+
+	r.query.Outputs = outputs
+
+	return r
+}
+
+func (r postToOriginalPostFindUnique) Exec(ctx context.Context) (
+	*PostModel,
+	error,
+) {
+	var v *PostModel
+	if err := r.query.Exec(ctx, &v); err != nil {
+		return nil, err
+	}
+
+	if v == nil {
+		return nil, ErrNotFound
+	}
+
+	return v, nil
+}
+
+func (r postToOriginalPostFindUnique) ExecInner(ctx context.Context) (
+	*InnerPost,
+	error,
+) {
+	var v *InnerPost
+	if err := r.query.Exec(ctx, &v); err != nil {
+		return nil, err
+	}
+
+	if v == nil {
+		return nil, ErrNotFound
+	}
+
+	return v, nil
+}
+
+func (r postToOriginalPostFindUnique) Update(params ...PostSetParam) postToOriginalPostUpdateUnique {
+	r.query.Operation = "mutation"
+	r.query.Method = "updateOne"
+	r.query.Model = "Post"
+
+	var v postToOriginalPostUpdateUnique
+	v.query = r.query
+	var fields []builder.Field
+	for _, q := range params {
+
+		field := q.field()
+
+		_, isJson := field.Value.(types.JSON)
+		if field.Value != nil && !isJson {
+			v := field.Value
+			field.Fields = []builder.Field{
+				{
+					Name:  "set",
+					Value: v,
+				},
+			}
+
+			field.Value = nil
+		}
+
+		fields = append(fields, field)
+	}
+	v.query.Inputs = append(v.query.Inputs, builder.Input{
+		Name:   "data",
+		Fields: fields,
+	})
+	return v
+}
+
+type postToOriginalPostUpdateUnique struct {
+	query builder.Query
+}
+
+func (r postToOriginalPostUpdateUnique) ExtractQuery() builder.Query {
+	return r.query
+}
+
+func (r postToOriginalPostUpdateUnique) postModel() {}
+
+func (r postToOriginalPostUpdateUnique) Exec(ctx context.Context) (*PostModel, error) {
+	var v PostModel
+	if err := r.query.Exec(ctx, &v); err != nil {
+		return nil, err
+	}
+	return &v, nil
+}
+
+func (r postToOriginalPostUpdateUnique) Tx() PostUniqueTxResult {
+	v := newPostUniqueTxResult()
+	v.query = r.query
+	v.query.TxResult = make(chan []byte, 1)
+	return v
+}
+
+func (r postToOriginalPostFindUnique) Delete() postToOriginalPostDeleteUnique {
+	var v postToOriginalPostDeleteUnique
+	v.query = r.query
+	v.query.Operation = "mutation"
+	v.query.Method = "deleteOne"
+	v.query.Model = "Post"
+
+	return v
+}
+
+type postToOriginalPostDeleteUnique struct {
+	query builder.Query
+}
+
+func (r postToOriginalPostDeleteUnique) ExtractQuery() builder.Query {
+	return r.query
+}
+
+func (p postToOriginalPostDeleteUnique) postModel() {}
+
+func (r postToOriginalPostDeleteUnique) Exec(ctx context.Context) (*PostModel, error) {
+	var v PostModel
+	if err := r.query.Exec(ctx, &v); err != nil {
+		return nil, err
+	}
+	return &v, nil
+}
+
+func (r postToOriginalPostDeleteUnique) Tx() PostUniqueTxResult {
+	v := newPostUniqueTxResult()
+	v.query = r.query
+	v.query.TxResult = make(chan []byte, 1)
+	return v
+}
+
+type postToOriginalPostFindFirst struct {
+	query builder.Query
+}
+
+func (r postToOriginalPostFindFirst) getQuery() builder.Query {
+	return r.query
+}
+
+func (r postToOriginalPostFindFirst) ExtractQuery() builder.Query {
+	return r.query
+}
+
+func (r postToOriginalPostFindFirst) with()         {}
+func (r postToOriginalPostFindFirst) postModel()    {}
+func (r postToOriginalPostFindFirst) postRelation() {}
+
+func (r postToOriginalPostFindFirst) With(params ...PostRelationWith) postToOriginalPostFindFirst {
+	for _, q := range params {
+		query := q.getQuery()
+		r.query.Outputs = append(r.query.Outputs, builder.Output{
+			Name:    query.Method,
+			Inputs:  query.Inputs,
+			Outputs: query.Outputs,
+		})
+	}
+
+	return r
+}
+
+func (r postToOriginalPostFindFirst) Select(params ...postPrismaFields) postToOriginalPostFindFirst {
+	var outputs []builder.Output
+
+	for _, param := range params {
+		outputs = append(outputs, builder.Output{
+			Name: string(param),
+		})
+	}
+
+	r.query.Outputs = outputs
+
+	return r
+}
+
+func (r postToOriginalPostFindFirst) Omit(params ...postPrismaFields) postToOriginalPostFindFirst {
+	var outputs []builder.Output
+
+	var raw []string
+	for _, param := range params {
+		raw = append(raw, string(param))
+	}
+
+	for _, output := range postOutput {
+		if !slices.Contains(raw, output.Name) {
+			outputs = append(outputs, output)
+		}
+	}
+
+	r.query.Outputs = outputs
+
+	return r
+}
+
+func (r postToOriginalPostFindFirst) OrderBy(params ...PostOrderByParam) postToOriginalPostFindFirst {
+	var fields []builder.Field
+
+	for _, param := range params {
+		fields = append(fields, builder.Field{
+			Name:   param.field().Name,
+			Value:  param.field().Value,
+			Fields: param.field().Fields,
+		})
+	}
+
+	r.query.Inputs = append(r.query.Inputs, builder.Input{
+		Name:     "orderBy",
+		Fields:   fields,
+		WrapList: true,
+	})
+
+	return r
+}
+
+func (r postToOriginalPostFindFirst) Skip(count int) postToOriginalPostFindFirst {
+	r.query.Inputs = append(r.query.Inputs, builder.Input{
+		Name:  "skip",
+		Value: count,
+	})
+	return r
+}
+
+func (r postToOriginalPostFindFirst) Take(count int) postToOriginalPostFindFirst {
+	r.query.Inputs = append(r.query.Inputs, builder.Input{
+		Name:  "take",
+		Value: count,
+	})
+	return r
+}
+
+func (r postToOriginalPostFindFirst) Cursor(cursor PostCursorParam) postToOriginalPostFindFirst {
+	r.query.Inputs = append(r.query.Inputs, builder.Input{
+		Name:   "cursor",
+		Fields: []builder.Field{cursor.field()},
+	})
+	return r
+}
+
+func (r postToOriginalPostFindFirst) Exec(ctx context.Context) (
+	*PostModel,
+	error,
+) {
+	var v *PostModel
+	if err := r.query.Exec(ctx, &v); err != nil {
+		return nil, err
+	}
+
+	if v == nil {
+		return nil, ErrNotFound
+	}
+
+	return v, nil
+}
+
+func (r postToOriginalPostFindFirst) ExecInner(ctx context.Context) (
+	*InnerPost,
+	error,
+) {
+	var v *InnerPost
+	if err := r.query.Exec(ctx, &v); err != nil {
+		return nil, err
+	}
+
+	if v == nil {
+		return nil, ErrNotFound
+	}
+
+	return v, nil
+}
+
+type postToOriginalPostFindMany struct {
+	query builder.Query
+}
+
+func (r postToOriginalPostFindMany) getQuery() builder.Query {
+	return r.query
+}
+
+func (r postToOriginalPostFindMany) ExtractQuery() builder.Query {
+	return r.query
+}
+
+func (r postToOriginalPostFindMany) with()         {}
+func (r postToOriginalPostFindMany) postModel()    {}
+func (r postToOriginalPostFindMany) postRelation() {}
+
+func (r postToOriginalPostFindMany) With(params ...PostRelationWith) postToOriginalPostFindMany {
+	for _, q := range params {
+		query := q.getQuery()
+		r.query.Outputs = append(r.query.Outputs, builder.Output{
+			Name:    query.Method,
+			Inputs:  query.Inputs,
+			Outputs: query.Outputs,
+		})
+	}
+
+	return r
+}
+
+func (r postToOriginalPostFindMany) Select(params ...postPrismaFields) postToOriginalPostFindMany {
+	var outputs []builder.Output
+
+	for _, param := range params {
+		outputs = append(outputs, builder.Output{
+			Name: string(param),
+		})
+	}
+
+	r.query.Outputs = outputs
+
+	return r
+}
+
+func (r postToOriginalPostFindMany) Omit(params ...postPrismaFields) postToOriginalPostFindMany {
+	var outputs []builder.Output
+
+	var raw []string
+	for _, param := range params {
+		raw = append(raw, string(param))
+	}
+
+	for _, output := range postOutput {
+		if !slices.Contains(raw, output.Name) {
+			outputs = append(outputs, output)
+		}
+	}
+
+	r.query.Outputs = outputs
+
+	return r
+}
+
+func (r postToOriginalPostFindMany) OrderBy(params ...PostOrderByParam) postToOriginalPostFindMany {
+	var fields []builder.Field
+
+	for _, param := range params {
+		fields = append(fields, builder.Field{
+			Name:   param.field().Name,
+			Value:  param.field().Value,
+			Fields: param.field().Fields,
+		})
+	}
+
+	r.query.Inputs = append(r.query.Inputs, builder.Input{
+		Name:     "orderBy",
+		Fields:   fields,
+		WrapList: true,
+	})
+
+	return r
+}
+
+func (r postToOriginalPostFindMany) Skip(count int) postToOriginalPostFindMany {
+	r.query.Inputs = append(r.query.Inputs, builder.Input{
+		Name:  "skip",
+		Value: count,
+	})
+	return r
+}
+
+func (r postToOriginalPostFindMany) Take(count int) postToOriginalPostFindMany {
+	r.query.Inputs = append(r.query.Inputs, builder.Input{
+		Name:  "take",
+		Value: count,
+	})
+	return r
+}
+
+func (r postToOriginalPostFindMany) Cursor(cursor PostCursorParam) postToOriginalPostFindMany {
+	r.query.Inputs = append(r.query.Inputs, builder.Input{
+		Name:   "cursor",
+		Fields: []builder.Field{cursor.field()},
+	})
+	return r
+}
+
+func (r postToOriginalPostFindMany) Exec(ctx context.Context) (
+	[]PostModel,
+	error,
+) {
+	var v []PostModel
+	if err := r.query.Exec(ctx, &v); err != nil {
+		return nil, err
+	}
+
+	return v, nil
+}
+
+func (r postToOriginalPostFindMany) ExecInner(ctx context.Context) (
+	[]InnerPost,
+	error,
+) {
+	var v []InnerPost
+	if err := r.query.Exec(ctx, &v); err != nil {
+		return nil, err
+	}
+
+	return v, nil
+}
+
+func (r postToOriginalPostFindMany) Update(params ...PostSetParam) postToOriginalPostUpdateMany {
+	r.query.Operation = "mutation"
+	r.query.Method = "updateMany"
+	r.query.Model = "Post"
+
+	r.query.Outputs = countOutput
+
+	var v postToOriginalPostUpdateMany
+	v.query = r.query
+	var fields []builder.Field
+	for _, q := range params {
+
+		field := q.field()
+
+		_, isJson := field.Value.(types.JSON)
+		if field.Value != nil && !isJson {
+			v := field.Value
+			field.Fields = []builder.Field{
+				{
+					Name:  "set",
+					Value: v,
+				},
+			}
+
+			field.Value = nil
+		}
+
+		fields = append(fields, field)
+	}
+	v.query.Inputs = append(v.query.Inputs, builder.Input{
+		Name:   "data",
+		Fields: fields,
+	})
+	return v
+}
+
+type postToOriginalPostUpdateMany struct {
+	query builder.Query
+}
+
+func (r postToOriginalPostUpdateMany) ExtractQuery() builder.Query {
+	return r.query
+}
+
+func (r postToOriginalPostUpdateMany) postModel() {}
+
+func (r postToOriginalPostUpdateMany) Exec(ctx context.Context) (*BatchResult, error) {
+	var v BatchResult
+	if err := r.query.Exec(ctx, &v); err != nil {
+		return nil, err
+	}
+	return &v, nil
+}
+
+func (r postToOriginalPostUpdateMany) Tx() PostManyTxResult {
+	v := newPostManyTxResult()
+	v.query = r.query
+	v.query.TxResult = make(chan []byte, 1)
+	return v
+}
+
+func (r postToOriginalPostFindMany) Delete() postToOriginalPostDeleteMany {
+	var v postToOriginalPostDeleteMany
+	v.query = r.query
+	v.query.Operation = "mutation"
+	v.query.Method = "deleteMany"
+	v.query.Model = "Post"
+
+	v.query.Outputs = countOutput
+
+	return v
+}
+
+type postToOriginalPostDeleteMany struct {
+	query builder.Query
+}
+
+func (r postToOriginalPostDeleteMany) ExtractQuery() builder.Query {
+	return r.query
+}
+
+func (p postToOriginalPostDeleteMany) postModel() {}
+
+func (r postToOriginalPostDeleteMany) Exec(ctx context.Context) (*BatchResult, error) {
+	var v BatchResult
+	if err := r.query.Exec(ctx, &v); err != nil {
+		return nil, err
+	}
+	return &v, nil
+}
+
+func (r postToOriginalPostDeleteMany) Tx() PostManyTxResult {
+	v := newPostManyTxResult()
+	v.query = r.query
+	v.query.TxResult = make(chan []byte, 1)
+	return v
+}
+
+type postToRepostedPostsFindUnique struct {
+	query builder.Query
+}
+
+func (r postToRepostedPostsFindUnique) getQuery() builder.Query {
+	return r.query
+}
+
+func (r postToRepostedPostsFindUnique) ExtractQuery() builder.Query {
+	return r.query
+}
+
+func (r postToRepostedPostsFindUnique) with()         {}
+func (r postToRepostedPostsFindUnique) postModel()    {}
+func (r postToRepostedPostsFindUnique) postRelation() {}
+
+func (r postToRepostedPostsFindUnique) With(params ...PostRelationWith) postToRepostedPostsFindUnique {
+	for _, q := range params {
+		query := q.getQuery()
+		r.query.Outputs = append(r.query.Outputs, builder.Output{
+			Name:    query.Method,
+			Inputs:  query.Inputs,
+			Outputs: query.Outputs,
+		})
+	}
+
+	return r
+}
+
+func (r postToRepostedPostsFindUnique) Select(params ...postPrismaFields) postToRepostedPostsFindUnique {
+	var outputs []builder.Output
+
+	for _, param := range params {
+		outputs = append(outputs, builder.Output{
+			Name: string(param),
+		})
+	}
+
+	r.query.Outputs = outputs
+
+	return r
+}
+
+func (r postToRepostedPostsFindUnique) Omit(params ...postPrismaFields) postToRepostedPostsFindUnique {
+	var outputs []builder.Output
+
+	var raw []string
+	for _, param := range params {
+		raw = append(raw, string(param))
+	}
+
+	for _, output := range postOutput {
+		if !slices.Contains(raw, output.Name) {
+			outputs = append(outputs, output)
+		}
+	}
+
+	r.query.Outputs = outputs
+
+	return r
+}
+
+func (r postToRepostedPostsFindUnique) Exec(ctx context.Context) (
+	*PostModel,
+	error,
+) {
+	var v *PostModel
+	if err := r.query.Exec(ctx, &v); err != nil {
+		return nil, err
+	}
+
+	if v == nil {
+		return nil, ErrNotFound
+	}
+
+	return v, nil
+}
+
+func (r postToRepostedPostsFindUnique) ExecInner(ctx context.Context) (
+	*InnerPost,
+	error,
+) {
+	var v *InnerPost
+	if err := r.query.Exec(ctx, &v); err != nil {
+		return nil, err
+	}
+
+	if v == nil {
+		return nil, ErrNotFound
+	}
+
+	return v, nil
+}
+
+func (r postToRepostedPostsFindUnique) Update(params ...PostSetParam) postToRepostedPostsUpdateUnique {
+	r.query.Operation = "mutation"
+	r.query.Method = "updateOne"
+	r.query.Model = "Post"
+
+	var v postToRepostedPostsUpdateUnique
+	v.query = r.query
+	var fields []builder.Field
+	for _, q := range params {
+
+		field := q.field()
+
+		_, isJson := field.Value.(types.JSON)
+		if field.Value != nil && !isJson {
+			v := field.Value
+			field.Fields = []builder.Field{
+				{
+					Name:  "set",
+					Value: v,
+				},
+			}
+
+			field.Value = nil
+		}
+
+		fields = append(fields, field)
+	}
+	v.query.Inputs = append(v.query.Inputs, builder.Input{
+		Name:   "data",
+		Fields: fields,
+	})
+	return v
+}
+
+type postToRepostedPostsUpdateUnique struct {
+	query builder.Query
+}
+
+func (r postToRepostedPostsUpdateUnique) ExtractQuery() builder.Query {
+	return r.query
+}
+
+func (r postToRepostedPostsUpdateUnique) postModel() {}
+
+func (r postToRepostedPostsUpdateUnique) Exec(ctx context.Context) (*PostModel, error) {
+	var v PostModel
+	if err := r.query.Exec(ctx, &v); err != nil {
+		return nil, err
+	}
+	return &v, nil
+}
+
+func (r postToRepostedPostsUpdateUnique) Tx() PostUniqueTxResult {
+	v := newPostUniqueTxResult()
+	v.query = r.query
+	v.query.TxResult = make(chan []byte, 1)
+	return v
+}
+
+func (r postToRepostedPostsFindUnique) Delete() postToRepostedPostsDeleteUnique {
+	var v postToRepostedPostsDeleteUnique
+	v.query = r.query
+	v.query.Operation = "mutation"
+	v.query.Method = "deleteOne"
+	v.query.Model = "Post"
+
+	return v
+}
+
+type postToRepostedPostsDeleteUnique struct {
+	query builder.Query
+}
+
+func (r postToRepostedPostsDeleteUnique) ExtractQuery() builder.Query {
+	return r.query
+}
+
+func (p postToRepostedPostsDeleteUnique) postModel() {}
+
+func (r postToRepostedPostsDeleteUnique) Exec(ctx context.Context) (*PostModel, error) {
+	var v PostModel
+	if err := r.query.Exec(ctx, &v); err != nil {
+		return nil, err
+	}
+	return &v, nil
+}
+
+func (r postToRepostedPostsDeleteUnique) Tx() PostUniqueTxResult {
+	v := newPostUniqueTxResult()
+	v.query = r.query
+	v.query.TxResult = make(chan []byte, 1)
+	return v
+}
+
+type postToRepostedPostsFindFirst struct {
+	query builder.Query
+}
+
+func (r postToRepostedPostsFindFirst) getQuery() builder.Query {
+	return r.query
+}
+
+func (r postToRepostedPostsFindFirst) ExtractQuery() builder.Query {
+	return r.query
+}
+
+func (r postToRepostedPostsFindFirst) with()         {}
+func (r postToRepostedPostsFindFirst) postModel()    {}
+func (r postToRepostedPostsFindFirst) postRelation() {}
+
+func (r postToRepostedPostsFindFirst) With(params ...PostRelationWith) postToRepostedPostsFindFirst {
+	for _, q := range params {
+		query := q.getQuery()
+		r.query.Outputs = append(r.query.Outputs, builder.Output{
+			Name:    query.Method,
+			Inputs:  query.Inputs,
+			Outputs: query.Outputs,
+		})
+	}
+
+	return r
+}
+
+func (r postToRepostedPostsFindFirst) Select(params ...postPrismaFields) postToRepostedPostsFindFirst {
+	var outputs []builder.Output
+
+	for _, param := range params {
+		outputs = append(outputs, builder.Output{
+			Name: string(param),
+		})
+	}
+
+	r.query.Outputs = outputs
+
+	return r
+}
+
+func (r postToRepostedPostsFindFirst) Omit(params ...postPrismaFields) postToRepostedPostsFindFirst {
+	var outputs []builder.Output
+
+	var raw []string
+	for _, param := range params {
+		raw = append(raw, string(param))
+	}
+
+	for _, output := range postOutput {
+		if !slices.Contains(raw, output.Name) {
+			outputs = append(outputs, output)
+		}
+	}
+
+	r.query.Outputs = outputs
+
+	return r
+}
+
+func (r postToRepostedPostsFindFirst) OrderBy(params ...PostOrderByParam) postToRepostedPostsFindFirst {
+	var fields []builder.Field
+
+	for _, param := range params {
+		fields = append(fields, builder.Field{
+			Name:   param.field().Name,
+			Value:  param.field().Value,
+			Fields: param.field().Fields,
+		})
+	}
+
+	r.query.Inputs = append(r.query.Inputs, builder.Input{
+		Name:     "orderBy",
+		Fields:   fields,
+		WrapList: true,
+	})
+
+	return r
+}
+
+func (r postToRepostedPostsFindFirst) Skip(count int) postToRepostedPostsFindFirst {
+	r.query.Inputs = append(r.query.Inputs, builder.Input{
+		Name:  "skip",
+		Value: count,
+	})
+	return r
+}
+
+func (r postToRepostedPostsFindFirst) Take(count int) postToRepostedPostsFindFirst {
+	r.query.Inputs = append(r.query.Inputs, builder.Input{
+		Name:  "take",
+		Value: count,
+	})
+	return r
+}
+
+func (r postToRepostedPostsFindFirst) Cursor(cursor PostCursorParam) postToRepostedPostsFindFirst {
+	r.query.Inputs = append(r.query.Inputs, builder.Input{
+		Name:   "cursor",
+		Fields: []builder.Field{cursor.field()},
+	})
+	return r
+}
+
+func (r postToRepostedPostsFindFirst) Exec(ctx context.Context) (
+	*PostModel,
+	error,
+) {
+	var v *PostModel
+	if err := r.query.Exec(ctx, &v); err != nil {
+		return nil, err
+	}
+
+	if v == nil {
+		return nil, ErrNotFound
+	}
+
+	return v, nil
+}
+
+func (r postToRepostedPostsFindFirst) ExecInner(ctx context.Context) (
+	*InnerPost,
+	error,
+) {
+	var v *InnerPost
+	if err := r.query.Exec(ctx, &v); err != nil {
+		return nil, err
+	}
+
+	if v == nil {
+		return nil, ErrNotFound
+	}
+
+	return v, nil
+}
+
+type postToRepostedPostsFindMany struct {
+	query builder.Query
+}
+
+func (r postToRepostedPostsFindMany) getQuery() builder.Query {
+	return r.query
+}
+
+func (r postToRepostedPostsFindMany) ExtractQuery() builder.Query {
+	return r.query
+}
+
+func (r postToRepostedPostsFindMany) with()         {}
+func (r postToRepostedPostsFindMany) postModel()    {}
+func (r postToRepostedPostsFindMany) postRelation() {}
+
+func (r postToRepostedPostsFindMany) With(params ...PostRelationWith) postToRepostedPostsFindMany {
+	for _, q := range params {
+		query := q.getQuery()
+		r.query.Outputs = append(r.query.Outputs, builder.Output{
+			Name:    query.Method,
+			Inputs:  query.Inputs,
+			Outputs: query.Outputs,
+		})
+	}
+
+	return r
+}
+
+func (r postToRepostedPostsFindMany) Select(params ...postPrismaFields) postToRepostedPostsFindMany {
+	var outputs []builder.Output
+
+	for _, param := range params {
+		outputs = append(outputs, builder.Output{
+			Name: string(param),
+		})
+	}
+
+	r.query.Outputs = outputs
+
+	return r
+}
+
+func (r postToRepostedPostsFindMany) Omit(params ...postPrismaFields) postToRepostedPostsFindMany {
+	var outputs []builder.Output
+
+	var raw []string
+	for _, param := range params {
+		raw = append(raw, string(param))
+	}
+
+	for _, output := range postOutput {
+		if !slices.Contains(raw, output.Name) {
+			outputs = append(outputs, output)
+		}
+	}
+
+	r.query.Outputs = outputs
+
+	return r
+}
+
+func (r postToRepostedPostsFindMany) OrderBy(params ...PostOrderByParam) postToRepostedPostsFindMany {
+	var fields []builder.Field
+
+	for _, param := range params {
+		fields = append(fields, builder.Field{
+			Name:   param.field().Name,
+			Value:  param.field().Value,
+			Fields: param.field().Fields,
+		})
+	}
+
+	r.query.Inputs = append(r.query.Inputs, builder.Input{
+		Name:     "orderBy",
+		Fields:   fields,
+		WrapList: true,
+	})
+
+	return r
+}
+
+func (r postToRepostedPostsFindMany) Skip(count int) postToRepostedPostsFindMany {
+	r.query.Inputs = append(r.query.Inputs, builder.Input{
+		Name:  "skip",
+		Value: count,
+	})
+	return r
+}
+
+func (r postToRepostedPostsFindMany) Take(count int) postToRepostedPostsFindMany {
+	r.query.Inputs = append(r.query.Inputs, builder.Input{
+		Name:  "take",
+		Value: count,
+	})
+	return r
+}
+
+func (r postToRepostedPostsFindMany) Cursor(cursor PostCursorParam) postToRepostedPostsFindMany {
+	r.query.Inputs = append(r.query.Inputs, builder.Input{
+		Name:   "cursor",
+		Fields: []builder.Field{cursor.field()},
+	})
+	return r
+}
+
+func (r postToRepostedPostsFindMany) Exec(ctx context.Context) (
+	[]PostModel,
+	error,
+) {
+	var v []PostModel
+	if err := r.query.Exec(ctx, &v); err != nil {
+		return nil, err
+	}
+
+	return v, nil
+}
+
+func (r postToRepostedPostsFindMany) ExecInner(ctx context.Context) (
+	[]InnerPost,
+	error,
+) {
+	var v []InnerPost
+	if err := r.query.Exec(ctx, &v); err != nil {
+		return nil, err
+	}
+
+	return v, nil
+}
+
+func (r postToRepostedPostsFindMany) Update(params ...PostSetParam) postToRepostedPostsUpdateMany {
+	r.query.Operation = "mutation"
+	r.query.Method = "updateMany"
+	r.query.Model = "Post"
+
+	r.query.Outputs = countOutput
+
+	var v postToRepostedPostsUpdateMany
+	v.query = r.query
+	var fields []builder.Field
+	for _, q := range params {
+
+		field := q.field()
+
+		_, isJson := field.Value.(types.JSON)
+		if field.Value != nil && !isJson {
+			v := field.Value
+			field.Fields = []builder.Field{
+				{
+					Name:  "set",
+					Value: v,
+				},
+			}
+
+			field.Value = nil
+		}
+
+		fields = append(fields, field)
+	}
+	v.query.Inputs = append(v.query.Inputs, builder.Input{
+		Name:   "data",
+		Fields: fields,
+	})
+	return v
+}
+
+type postToRepostedPostsUpdateMany struct {
+	query builder.Query
+}
+
+func (r postToRepostedPostsUpdateMany) ExtractQuery() builder.Query {
+	return r.query
+}
+
+func (r postToRepostedPostsUpdateMany) postModel() {}
+
+func (r postToRepostedPostsUpdateMany) Exec(ctx context.Context) (*BatchResult, error) {
+	var v BatchResult
+	if err := r.query.Exec(ctx, &v); err != nil {
+		return nil, err
+	}
+	return &v, nil
+}
+
+func (r postToRepostedPostsUpdateMany) Tx() PostManyTxResult {
+	v := newPostManyTxResult()
+	v.query = r.query
+	v.query.TxResult = make(chan []byte, 1)
+	return v
+}
+
+func (r postToRepostedPostsFindMany) Delete() postToRepostedPostsDeleteMany {
+	var v postToRepostedPostsDeleteMany
+	v.query = r.query
+	v.query.Operation = "mutation"
+	v.query.Method = "deleteMany"
+	v.query.Model = "Post"
+
+	v.query.Outputs = countOutput
+
+	return v
+}
+
+type postToRepostedPostsDeleteMany struct {
+	query builder.Query
+}
+
+func (r postToRepostedPostsDeleteMany) ExtractQuery() builder.Query {
+	return r.query
+}
+
+func (p postToRepostedPostsDeleteMany) postModel() {}
+
+func (r postToRepostedPostsDeleteMany) Exec(ctx context.Context) (*BatchResult, error) {
+	var v BatchResult
+	if err := r.query.Exec(ctx, &v); err != nil {
+		return nil, err
+	}
+	return &v, nil
+}
+
+func (r postToRepostedPostsDeleteMany) Tx() PostManyTxResult {
 	v := newPostManyTxResult()
 	v.query = r.query
 	v.query.TxResult = make(chan []byte, 1)
