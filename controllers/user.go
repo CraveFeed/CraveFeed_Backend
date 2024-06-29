@@ -269,9 +269,11 @@ func Repost(w http.ResponseWriter, r *http.Request) {
 func GetReposts(w http.ResponseWriter, r *http.Request) {
 	pClient := database.PClient
 	query := r.URL.Query()
-	postId := query.Get("postId")
+	profileData := interfaces.CreateProfileIdRequest{
+		PostId: query.Get("postId"),
+	}
 	reposts, err := pClient.Client.Post.FindMany(
-		db.Post.OriginalPostID.Equals(postId),
+		db.Post.OriginalPostID.Equals(profileData.PostId),
 	).Exec(pClient.Context)
 	if err != nil {
 		http.Error(w, "Failed to fetch reposts", http.StatusInternalServerError)
@@ -279,4 +281,52 @@ func GetReposts(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	helpers.WriteJSON(w, http.StatusOK, reposts)
+}
+
+func GetUsernameUserId(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	pClient := database.PClient
+	var profileUsername interfaces.CreateUsernameRequest
+	err := json.NewDecoder(r.Body).Decode(&profileUsername)
+	if err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+	username := profileUsername.Username
+	profile, err := pClient.Client.User.FindUnique(
+		db.User.Username.Equals(username),
+	).Exec(pClient.Context)
+	if err != nil {
+		http.Error(w, "User not found", http.StatusNotFound)
+		return
+	}
+	response := map[string]interface{}{
+		"id":       profile.ID,
+		"username": profile.Username,
+	}
+	w.Header().Set("Content-Type", "application/json")
+	helpers.WriteJSON(w, http.StatusOK, response)
+}
+
+func EditPosts(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	pClient := database.PClient
+	var profileData interfaces.EditPostRequest
+	err := json.NewDecoder(r.Body).Decode(&profileData)
+	posts, err := pClient.Client.Post.UpsertOne(
+		db.Post.ID.Equals(profileData.PostID),
+	).Update(
+		db.Post.Title.Set(profileData.Title),
+		db.Post.Description.Set(profileData.Description),
+		db.Post.Longitude.Set(profileData.Longitude),
+		db.Post.Latitude.Set(profileData.Latitude),
+		db.Post.Pictures.Set(profileData.Pictures),
+		db.Post.City.Set(profileData.City),
+	).Exec(pClient.Context)
+	if err != nil {
+		http.Error(w, "Failed to Update Post", http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	helpers.WriteJSON(w, http.StatusOK, posts)
 }

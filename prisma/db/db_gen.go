@@ -21819,6 +21819,11 @@ type postWithPrismaUserIDEqualsParam struct {
 	query builder.Query
 }
 
+func (p postWithPrismaUserIDEqualsParam) unique() {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (p postWithPrismaUserIDEqualsParam) field() builder.Field {
 	return p.data
 }

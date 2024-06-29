@@ -14,6 +14,14 @@ type CreateProfileRequest struct {
 	Id string `json:"id"`
 }
 
+type CreateProfileIdRequest struct {
+	PostId string `json:"postId"`
+}
+
+type CreateUsernameRequest struct {
+	Username string `json:"username"`
+}
+
 type RepostRequest struct {
 	PostID string `json:"postId"`
 	UserID string `json:"userId"`
@@ -56,4 +64,14 @@ type CreateResturantRequest struct {
 	City    string `json:"city"`
 	State   string `json:"state"`
 	ZipCode string `json:"zipCode"`
+}
+
+type EditPostRequest struct {
+	PostID      string `json:"postId"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	Longitude   string `json:"longitude"`
+	Latitude    string `json:"latitude"`
+	Pictures    string `json:"pictures"`
+	City        string `json:"city"`
 }
