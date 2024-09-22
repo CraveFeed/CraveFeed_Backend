@@ -39,7 +39,7 @@ func UpdateCachePeriodically() {
 		} else {
 			fmt.Println("Cache updated successfully")
 		}
-		time.Sleep(5 * time.Second)
+		time.Sleep(10 * time.Second)
 	}
 }
 

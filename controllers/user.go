@@ -8,6 +8,7 @@ import (
 	"cravefeed_backend/prisma/db"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 )
 
@@ -161,10 +162,8 @@ func HandleFollowRequest(w http.ResponseWriter, r *http.Request) {
 func GetProfileBio(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	pClient := database.PClient
-	query := r.URL.Query()
-	profileData := interfaces.CreateProfileRequest{
-		Id: query.Get("id"),
-	}
+	var profileData interfaces.CreateProfileRequest
+	err := json.NewDecoder(r.Body).Decode(&profileData)
 	profile, err := pClient.Client.User.FindUnique(
 		db.User.ID.Equals(profileData.Id),
 	).With(
@@ -192,12 +191,11 @@ func GetProfileBio(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetProfileInfo(w http.ResponseWriter, r *http.Request) {
-	defer r.Body.Close()
 	pClient := database.PClient
 	var profileData interfaces.CreateProfileRequest
 	err := json.NewDecoder(r.Body).Decode(&profileData)
-	if err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+	if err != nil || profileData.Id == "" {
+		http.Error(w, "Invalid request body or missing user ID", http.StatusBadRequest)
 		return
 	}
 	userID := profileData.Id
@@ -222,9 +220,9 @@ func GetProfileInfo(w http.ResponseWriter, r *http.Request) {
 		"noOfPosts":     len(profile.Posts()),
 		"noOfFollowers": len(profile.Followers()),
 		"noOfFollowing": len(profile.Following()),
-		"userPosts":     profile.Posts,
-		"followers":     profile.Following(),
-		"following":     profile.Followers(),
+		"userPosts":     profile.Posts(),
+		"followers":     profile.Followers(),
+		"following":     profile.Following(),
 	}
 	w.Header().Set("Content-Type", "application/json")
 	helpers.WriteJSON(w, http.StatusOK, response)
@@ -248,6 +246,14 @@ func Repost(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Original post not found", http.StatusNotFound)
 		return
 	}
+	existingRepost, err := pClient.Client.Post.FindFirst(
+		db.Post.UserID.Equals(userID),
+		db.Post.OriginalPostID.Equals(originalPostID),
+	).Exec(pClient.Context)
+	if existingRepost != nil {
+		http.Error(w, "Repost already exists for this user", http.StatusConflict)
+		return
+	}
 	newPost, err := pClient.Client.Post.CreateOne(
 		db.Post.UserID.Set(userID),
 		db.Post.Title.Set("Repost: "+originalPost.Title),
@@ -268,10 +274,8 @@ func Repost(w http.ResponseWriter, r *http.Request) {
 
 func GetReposts(w http.ResponseWriter, r *http.Request) {
 	pClient := database.PClient
-	query := r.URL.Query()
-	profileData := interfaces.CreateProfileIdRequest{
-		PostId: query.Get("postId"),
-	}
+	var profileData interfaces.CreateProfileIdRequest
+	err := json.NewDecoder(r.Body).Decode(&profileData)
 	reposts, err := pClient.Client.Post.FindMany(
 		db.Post.OriginalPostID.Equals(profileData.PostId),
 	).Exec(pClient.Context)
@@ -313,8 +317,16 @@ func EditPosts(w http.ResponseWriter, r *http.Request) {
 	pClient := database.PClient
 	var profileData interfaces.EditPostRequest
 	err := json.NewDecoder(r.Body).Decode(&profileData)
+	if err != nil {
+		http.Error(w, "Invalid input data", http.StatusBadRequest)
+		return
+	}
+	if profileData.PostID == "" {
+		http.Error(w, "Post ID is required", http.StatusBadRequest)
+		return
+	}
 	posts, err := pClient.Client.Post.UpsertOne(
-		db.Post.ID.Equals(profileData.PostID),
+		db.Post.ID.Equals(profileData.PostID), // Ensure this matches your ORM's method
 	).Update(
 		db.Post.Title.Set(profileData.Title),
 		db.Post.Description.Set(profileData.Description),
@@ -324,6 +336,7 @@ func EditPosts(w http.ResponseWriter, r *http.Request) {
 		db.Post.City.Set(profileData.City),
 	).Exec(pClient.Context)
 	if err != nil {
+		log.Printf("Error updating post: %v", err)
 		http.Error(w, "Failed to Update Post", http.StatusInternalServerError)
 		return
 	}
