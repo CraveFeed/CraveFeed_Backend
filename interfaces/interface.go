@@ -8,6 +8,12 @@ type CreateUserRequest struct {
 	LastName  string `json:"lastName"`
 	Bio       string `json:"bio"`    //Optional (Handle login in API)
 	Avatar    string `json:"avatar"` //Optional (Handle logic in API)
+	Spiciness int    `json:"spiciness"`
+	Sweetness int    `json:"sweetness"`
+	Sourness  int    `json:"sourness"`
+	Type      string `json:"type"`
+	Allergies string `json:"allergies"`
+	City      string `json:"city"`
 }
 
 type CreateProfileRequest struct {
@@ -35,6 +41,12 @@ type CreatePostRequest struct {
 	Pictures    string `json:"pictures"`
 	City        string `json:"city"`
 	UserID      string `json:"userId"`
+	Cuisine     string `json:"cuisine"`
+	Dish        string `json:"dish"`
+	Type        string `json:"type"`
+	Spiciness   int    `json:"spiciness"`
+	Sweetness   int    `json:"sweetness"`
+	Sourness    int    `json:"sourness"`
 }
 
 type CreateCommentRequest struct {
@@ -74,4 +86,10 @@ type EditPostRequest struct {
 	Latitude    string `json:"latitude"`
 	Pictures    string `json:"pictures"`
 	City        string `json:"city"`
+	Cuisine     string `json:"cuisine"`
+	Dish        string `json:"dish"`
+	Type        string `json:"type"`
+	Spiciness   int    `json:"spiciness"`
+	Sweetness   int    `json:"sweetness"`
+	Sourness    int    `json:"sourness"`
 }

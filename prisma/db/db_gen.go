@@ -90,6 +90,12 @@ model User {
   avatar    String
   firstName String
   lastName  String
+  Spiciness Int
+  Sweetness Int
+  Sourness  Int
+  Type      String
+  Allergies String
+  City      String
   posts     Post[]
   likes     Like[]
   comments  Comment[]
@@ -106,6 +112,12 @@ model Post {
   description    String
   longitude      String
   latitude       String
+  Cuisine        String
+  Dish           String
+  Type           String
+  Spiciness      Int
+  Sweetness      Int
+  Sourness       Int
   pictures       String
   userId         String
   city           String
@@ -306,6 +318,12 @@ const (
 	UserScalarFieldEnumAvatar    UserScalarFieldEnum = "avatar"
 	UserScalarFieldEnumFirstName UserScalarFieldEnum = "firstName"
 	UserScalarFieldEnumLastName  UserScalarFieldEnum = "lastName"
+	UserScalarFieldEnumSpiciness UserScalarFieldEnum = "Spiciness"
+	UserScalarFieldEnumSweetness UserScalarFieldEnum = "Sweetness"
+	UserScalarFieldEnumSourness  UserScalarFieldEnum = "Sourness"
+	UserScalarFieldEnumType      UserScalarFieldEnum = "Type"
+	UserScalarFieldEnumAllergies UserScalarFieldEnum = "Allergies"
+	UserScalarFieldEnumCity      UserScalarFieldEnum = "City"
 )
 
 type PostScalarFieldEnum string
@@ -318,6 +336,12 @@ const (
 	PostScalarFieldEnumDescription    PostScalarFieldEnum = "description"
 	PostScalarFieldEnumLongitude      PostScalarFieldEnum = "longitude"
 	PostScalarFieldEnumLatitude       PostScalarFieldEnum = "latitude"
+	PostScalarFieldEnumCuisine        PostScalarFieldEnum = "Cuisine"
+	PostScalarFieldEnumDish           PostScalarFieldEnum = "Dish"
+	PostScalarFieldEnumType           PostScalarFieldEnum = "Type"
+	PostScalarFieldEnumSpiciness      PostScalarFieldEnum = "Spiciness"
+	PostScalarFieldEnumSweetness      PostScalarFieldEnum = "Sweetness"
+	PostScalarFieldEnumSourness       PostScalarFieldEnum = "Sourness"
 	PostScalarFieldEnumPictures       PostScalarFieldEnum = "pictures"
 	PostScalarFieldEnumUserID         PostScalarFieldEnum = "userId"
 	PostScalarFieldEnumCity           PostScalarFieldEnum = "city"
@@ -443,6 +467,18 @@ const userFieldFirstName userPrismaFields = "firstName"
 
 const userFieldLastName userPrismaFields = "lastName"
 
+const userFieldSpiciness userPrismaFields = "Spiciness"
+
+const userFieldSweetness userPrismaFields = "Sweetness"
+
+const userFieldSourness userPrismaFields = "Sourness"
+
+const userFieldType userPrismaFields = "Type"
+
+const userFieldAllergies userPrismaFields = "Allergies"
+
+const userFieldCity userPrismaFields = "City"
+
 const userFieldPosts userPrismaFields = "posts"
 
 const userFieldLikes userPrismaFields = "likes"
@@ -470,6 +506,18 @@ const postFieldDescription postPrismaFields = "description"
 const postFieldLongitude postPrismaFields = "longitude"
 
 const postFieldLatitude postPrismaFields = "latitude"
+
+const postFieldCuisine postPrismaFields = "Cuisine"
+
+const postFieldDish postPrismaFields = "Dish"
+
+const postFieldType postPrismaFields = "Type"
+
+const postFieldSpiciness postPrismaFields = "Spiciness"
+
+const postFieldSweetness postPrismaFields = "Sweetness"
+
+const postFieldSourness postPrismaFields = "Sourness"
 
 const postFieldPictures postPrismaFields = "pictures"
 
@@ -940,6 +988,12 @@ type InnerUser struct {
 	Avatar    string `json:"avatar"`
 	FirstName string `json:"firstName"`
 	LastName  string `json:"lastName"`
+	Spiciness int    `json:"Spiciness"`
+	Sweetness int    `json:"Sweetness"`
+	Sourness  int    `json:"Sourness"`
+	Type      string `json:"Type"`
+	Allergies string `json:"Allergies"`
+	City      string `json:"City"`
 }
 
 // RawUserModel is a struct for User when used in raw queries
@@ -952,6 +1006,12 @@ type RawUserModel struct {
 	Avatar    RawString `json:"avatar"`
 	FirstName RawString `json:"firstName"`
 	LastName  RawString `json:"lastName"`
+	Spiciness RawInt    `json:"Spiciness"`
+	Sweetness RawInt    `json:"Sweetness"`
+	Sourness  RawInt    `json:"Sourness"`
+	Type      RawString `json:"Type"`
+	Allergies RawString `json:"Allergies"`
+	City      RawString `json:"City"`
 }
 
 // RelationsUser holds the relation data separately
@@ -1021,6 +1081,12 @@ type InnerPost struct {
 	Description    string   `json:"description"`
 	Longitude      string   `json:"longitude"`
 	Latitude       string   `json:"latitude"`
+	Cuisine        string   `json:"Cuisine"`
+	Dish           string   `json:"Dish"`
+	Type           string   `json:"Type"`
+	Spiciness      int      `json:"Spiciness"`
+	Sweetness      int      `json:"Sweetness"`
+	Sourness       int      `json:"Sourness"`
 	Pictures       string   `json:"pictures"`
 	UserID         string   `json:"userId"`
 	City           string   `json:"city"`
@@ -1037,6 +1103,12 @@ type RawPostModel struct {
 	Description    RawString   `json:"description"`
 	Longitude      RawString   `json:"longitude"`
 	Latitude       RawString   `json:"latitude"`
+	Cuisine        RawString   `json:"Cuisine"`
+	Dish           RawString   `json:"Dish"`
+	Type           RawString   `json:"Type"`
+	Spiciness      RawInt      `json:"Spiciness"`
+	Sweetness      RawInt      `json:"Sweetness"`
+	Sourness       RawInt      `json:"Sourness"`
 	Pictures       RawString   `json:"pictures"`
 	UserID         RawString   `json:"userId"`
 	City           RawString   `json:"city"`
@@ -1375,6 +1447,36 @@ type userQuery struct {
 	//
 	// @required
 	LastName userQueryLastNameString
+
+	// Spiciness
+	//
+	// @required
+	Spiciness userQuerySpicinessInt
+
+	// Sweetness
+	//
+	// @required
+	Sweetness userQuerySweetnessInt
+
+	// Sourness
+	//
+	// @required
+	Sourness userQuerySournessInt
+
+	// Type
+	//
+	// @required
+	Type userQueryTypeString
+
+	// Allergies
+	//
+	// @required
+	Allergies userQueryAllergiesString
+
+	// City
+	//
+	// @required
+	City userQueryCityString
 
 	Posts userQueryPostsRelations
 
@@ -4217,6 +4319,2244 @@ func (r userQueryLastNameString) Field() userPrismaFields {
 }
 
 // base struct
+type userQuerySpicinessInt struct{}
+
+// Set the required value of Spiciness
+func (r userQuerySpicinessInt) Set(value int) userWithPrismaSpicinessSetParam {
+
+	return userWithPrismaSpicinessSetParam{
+		data: builder.Field{
+			Name:  "Spiciness",
+			Value: value,
+		},
+	}
+
+}
+
+// Set the optional value of Spiciness dynamically
+func (r userQuerySpicinessInt) SetIfPresent(value *Int) userWithPrismaSpicinessSetParam {
+	if value == nil {
+		return userWithPrismaSpicinessSetParam{}
+	}
+
+	return r.Set(*value)
+}
+
+// Increment the required value of Spiciness
+func (r userQuerySpicinessInt) Increment(value int) userWithPrismaSpicinessSetParam {
+	return userWithPrismaSpicinessSetParam{
+		data: builder.Field{
+			Name: "Spiciness",
+			Fields: []builder.Field{
+				builder.Field{
+					Name:  "increment",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQuerySpicinessInt) IncrementIfPresent(value *int) userWithPrismaSpicinessSetParam {
+	if value == nil {
+		return userWithPrismaSpicinessSetParam{}
+	}
+	return r.Increment(*value)
+}
+
+// Decrement the required value of Spiciness
+func (r userQuerySpicinessInt) Decrement(value int) userWithPrismaSpicinessSetParam {
+	return userWithPrismaSpicinessSetParam{
+		data: builder.Field{
+			Name: "Spiciness",
+			Fields: []builder.Field{
+				builder.Field{
+					Name:  "decrement",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQuerySpicinessInt) DecrementIfPresent(value *int) userWithPrismaSpicinessSetParam {
+	if value == nil {
+		return userWithPrismaSpicinessSetParam{}
+	}
+	return r.Decrement(*value)
+}
+
+// Multiply the required value of Spiciness
+func (r userQuerySpicinessInt) Multiply(value int) userWithPrismaSpicinessSetParam {
+	return userWithPrismaSpicinessSetParam{
+		data: builder.Field{
+			Name: "Spiciness",
+			Fields: []builder.Field{
+				builder.Field{
+					Name:  "multiply",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQuerySpicinessInt) MultiplyIfPresent(value *int) userWithPrismaSpicinessSetParam {
+	if value == nil {
+		return userWithPrismaSpicinessSetParam{}
+	}
+	return r.Multiply(*value)
+}
+
+// Divide the required value of Spiciness
+func (r userQuerySpicinessInt) Divide(value int) userWithPrismaSpicinessSetParam {
+	return userWithPrismaSpicinessSetParam{
+		data: builder.Field{
+			Name: "Spiciness",
+			Fields: []builder.Field{
+				builder.Field{
+					Name:  "divide",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQuerySpicinessInt) DivideIfPresent(value *int) userWithPrismaSpicinessSetParam {
+	if value == nil {
+		return userWithPrismaSpicinessSetParam{}
+	}
+	return r.Divide(*value)
+}
+
+func (r userQuerySpicinessInt) Equals(value int) userWithPrismaSpicinessEqualsParam {
+
+	return userWithPrismaSpicinessEqualsParam{
+		data: builder.Field{
+			Name: "Spiciness",
+			Fields: []builder.Field{
+				{
+					Name:  "equals",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQuerySpicinessInt) EqualsIfPresent(value *int) userWithPrismaSpicinessEqualsParam {
+	if value == nil {
+		return userWithPrismaSpicinessEqualsParam{}
+	}
+	return r.Equals(*value)
+}
+
+func (r userQuerySpicinessInt) Order(direction SortOrder) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name:  "Spiciness",
+			Value: direction,
+		},
+	}
+}
+
+func (r userQuerySpicinessInt) Cursor(cursor int) userCursorParam {
+	return userCursorParam{
+		data: builder.Field{
+			Name:  "Spiciness",
+			Value: cursor,
+		},
+	}
+}
+
+func (r userQuerySpicinessInt) In(value []int) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Spiciness",
+			Fields: []builder.Field{
+				{
+					Name:  "in",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQuerySpicinessInt) InIfPresent(value []int) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.In(value)
+}
+
+func (r userQuerySpicinessInt) NotIn(value []int) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Spiciness",
+			Fields: []builder.Field{
+				{
+					Name:  "notIn",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQuerySpicinessInt) NotInIfPresent(value []int) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.NotIn(value)
+}
+
+func (r userQuerySpicinessInt) Lt(value int) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Spiciness",
+			Fields: []builder.Field{
+				{
+					Name:  "lt",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQuerySpicinessInt) LtIfPresent(value *int) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.Lt(*value)
+}
+
+func (r userQuerySpicinessInt) Lte(value int) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Spiciness",
+			Fields: []builder.Field{
+				{
+					Name:  "lte",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQuerySpicinessInt) LteIfPresent(value *int) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.Lte(*value)
+}
+
+func (r userQuerySpicinessInt) Gt(value int) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Spiciness",
+			Fields: []builder.Field{
+				{
+					Name:  "gt",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQuerySpicinessInt) GtIfPresent(value *int) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.Gt(*value)
+}
+
+func (r userQuerySpicinessInt) Gte(value int) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Spiciness",
+			Fields: []builder.Field{
+				{
+					Name:  "gte",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQuerySpicinessInt) GteIfPresent(value *int) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.Gte(*value)
+}
+
+func (r userQuerySpicinessInt) Not(value int) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Spiciness",
+			Fields: []builder.Field{
+				{
+					Name:  "not",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQuerySpicinessInt) NotIfPresent(value *int) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.Not(*value)
+}
+
+// deprecated: Use Lt instead.
+
+func (r userQuerySpicinessInt) LT(value int) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Spiciness",
+			Fields: []builder.Field{
+				{
+					Name:  "lt",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+// deprecated: Use LtIfPresent instead.
+func (r userQuerySpicinessInt) LTIfPresent(value *int) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.LT(*value)
+}
+
+// deprecated: Use Lte instead.
+
+func (r userQuerySpicinessInt) LTE(value int) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Spiciness",
+			Fields: []builder.Field{
+				{
+					Name:  "lte",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+// deprecated: Use LteIfPresent instead.
+func (r userQuerySpicinessInt) LTEIfPresent(value *int) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.LTE(*value)
+}
+
+// deprecated: Use Gt instead.
+
+func (r userQuerySpicinessInt) GT(value int) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Spiciness",
+			Fields: []builder.Field{
+				{
+					Name:  "gt",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+// deprecated: Use GtIfPresent instead.
+func (r userQuerySpicinessInt) GTIfPresent(value *int) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.GT(*value)
+}
+
+// deprecated: Use Gte instead.
+
+func (r userQuerySpicinessInt) GTE(value int) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Spiciness",
+			Fields: []builder.Field{
+				{
+					Name:  "gte",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+// deprecated: Use GteIfPresent instead.
+func (r userQuerySpicinessInt) GTEIfPresent(value *int) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.GTE(*value)
+}
+
+func (r userQuerySpicinessInt) Field() userPrismaFields {
+	return userFieldSpiciness
+}
+
+// base struct
+type userQuerySweetnessInt struct{}
+
+// Set the required value of Sweetness
+func (r userQuerySweetnessInt) Set(value int) userWithPrismaSweetnessSetParam {
+
+	return userWithPrismaSweetnessSetParam{
+		data: builder.Field{
+			Name:  "Sweetness",
+			Value: value,
+		},
+	}
+
+}
+
+// Set the optional value of Sweetness dynamically
+func (r userQuerySweetnessInt) SetIfPresent(value *Int) userWithPrismaSweetnessSetParam {
+	if value == nil {
+		return userWithPrismaSweetnessSetParam{}
+	}
+
+	return r.Set(*value)
+}
+
+// Increment the required value of Sweetness
+func (r userQuerySweetnessInt) Increment(value int) userWithPrismaSweetnessSetParam {
+	return userWithPrismaSweetnessSetParam{
+		data: builder.Field{
+			Name: "Sweetness",
+			Fields: []builder.Field{
+				builder.Field{
+					Name:  "increment",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQuerySweetnessInt) IncrementIfPresent(value *int) userWithPrismaSweetnessSetParam {
+	if value == nil {
+		return userWithPrismaSweetnessSetParam{}
+	}
+	return r.Increment(*value)
+}
+
+// Decrement the required value of Sweetness
+func (r userQuerySweetnessInt) Decrement(value int) userWithPrismaSweetnessSetParam {
+	return userWithPrismaSweetnessSetParam{
+		data: builder.Field{
+			Name: "Sweetness",
+			Fields: []builder.Field{
+				builder.Field{
+					Name:  "decrement",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQuerySweetnessInt) DecrementIfPresent(value *int) userWithPrismaSweetnessSetParam {
+	if value == nil {
+		return userWithPrismaSweetnessSetParam{}
+	}
+	return r.Decrement(*value)
+}
+
+// Multiply the required value of Sweetness
+func (r userQuerySweetnessInt) Multiply(value int) userWithPrismaSweetnessSetParam {
+	return userWithPrismaSweetnessSetParam{
+		data: builder.Field{
+			Name: "Sweetness",
+			Fields: []builder.Field{
+				builder.Field{
+					Name:  "multiply",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQuerySweetnessInt) MultiplyIfPresent(value *int) userWithPrismaSweetnessSetParam {
+	if value == nil {
+		return userWithPrismaSweetnessSetParam{}
+	}
+	return r.Multiply(*value)
+}
+
+// Divide the required value of Sweetness
+func (r userQuerySweetnessInt) Divide(value int) userWithPrismaSweetnessSetParam {
+	return userWithPrismaSweetnessSetParam{
+		data: builder.Field{
+			Name: "Sweetness",
+			Fields: []builder.Field{
+				builder.Field{
+					Name:  "divide",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQuerySweetnessInt) DivideIfPresent(value *int) userWithPrismaSweetnessSetParam {
+	if value == nil {
+		return userWithPrismaSweetnessSetParam{}
+	}
+	return r.Divide(*value)
+}
+
+func (r userQuerySweetnessInt) Equals(value int) userWithPrismaSweetnessEqualsParam {
+
+	return userWithPrismaSweetnessEqualsParam{
+		data: builder.Field{
+			Name: "Sweetness",
+			Fields: []builder.Field{
+				{
+					Name:  "equals",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQuerySweetnessInt) EqualsIfPresent(value *int) userWithPrismaSweetnessEqualsParam {
+	if value == nil {
+		return userWithPrismaSweetnessEqualsParam{}
+	}
+	return r.Equals(*value)
+}
+
+func (r userQuerySweetnessInt) Order(direction SortOrder) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name:  "Sweetness",
+			Value: direction,
+		},
+	}
+}
+
+func (r userQuerySweetnessInt) Cursor(cursor int) userCursorParam {
+	return userCursorParam{
+		data: builder.Field{
+			Name:  "Sweetness",
+			Value: cursor,
+		},
+	}
+}
+
+func (r userQuerySweetnessInt) In(value []int) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Sweetness",
+			Fields: []builder.Field{
+				{
+					Name:  "in",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQuerySweetnessInt) InIfPresent(value []int) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.In(value)
+}
+
+func (r userQuerySweetnessInt) NotIn(value []int) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Sweetness",
+			Fields: []builder.Field{
+				{
+					Name:  "notIn",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQuerySweetnessInt) NotInIfPresent(value []int) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.NotIn(value)
+}
+
+func (r userQuerySweetnessInt) Lt(value int) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Sweetness",
+			Fields: []builder.Field{
+				{
+					Name:  "lt",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQuerySweetnessInt) LtIfPresent(value *int) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.Lt(*value)
+}
+
+func (r userQuerySweetnessInt) Lte(value int) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Sweetness",
+			Fields: []builder.Field{
+				{
+					Name:  "lte",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQuerySweetnessInt) LteIfPresent(value *int) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.Lte(*value)
+}
+
+func (r userQuerySweetnessInt) Gt(value int) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Sweetness",
+			Fields: []builder.Field{
+				{
+					Name:  "gt",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQuerySweetnessInt) GtIfPresent(value *int) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.Gt(*value)
+}
+
+func (r userQuerySweetnessInt) Gte(value int) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Sweetness",
+			Fields: []builder.Field{
+				{
+					Name:  "gte",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQuerySweetnessInt) GteIfPresent(value *int) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.Gte(*value)
+}
+
+func (r userQuerySweetnessInt) Not(value int) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Sweetness",
+			Fields: []builder.Field{
+				{
+					Name:  "not",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQuerySweetnessInt) NotIfPresent(value *int) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.Not(*value)
+}
+
+// deprecated: Use Lt instead.
+
+func (r userQuerySweetnessInt) LT(value int) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Sweetness",
+			Fields: []builder.Field{
+				{
+					Name:  "lt",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+// deprecated: Use LtIfPresent instead.
+func (r userQuerySweetnessInt) LTIfPresent(value *int) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.LT(*value)
+}
+
+// deprecated: Use Lte instead.
+
+func (r userQuerySweetnessInt) LTE(value int) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Sweetness",
+			Fields: []builder.Field{
+				{
+					Name:  "lte",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+// deprecated: Use LteIfPresent instead.
+func (r userQuerySweetnessInt) LTEIfPresent(value *int) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.LTE(*value)
+}
+
+// deprecated: Use Gt instead.
+
+func (r userQuerySweetnessInt) GT(value int) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Sweetness",
+			Fields: []builder.Field{
+				{
+					Name:  "gt",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+// deprecated: Use GtIfPresent instead.
+func (r userQuerySweetnessInt) GTIfPresent(value *int) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.GT(*value)
+}
+
+// deprecated: Use Gte instead.
+
+func (r userQuerySweetnessInt) GTE(value int) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Sweetness",
+			Fields: []builder.Field{
+				{
+					Name:  "gte",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+// deprecated: Use GteIfPresent instead.
+func (r userQuerySweetnessInt) GTEIfPresent(value *int) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.GTE(*value)
+}
+
+func (r userQuerySweetnessInt) Field() userPrismaFields {
+	return userFieldSweetness
+}
+
+// base struct
+type userQuerySournessInt struct{}
+
+// Set the required value of Sourness
+func (r userQuerySournessInt) Set(value int) userWithPrismaSournessSetParam {
+
+	return userWithPrismaSournessSetParam{
+		data: builder.Field{
+			Name:  "Sourness",
+			Value: value,
+		},
+	}
+
+}
+
+// Set the optional value of Sourness dynamically
+func (r userQuerySournessInt) SetIfPresent(value *Int) userWithPrismaSournessSetParam {
+	if value == nil {
+		return userWithPrismaSournessSetParam{}
+	}
+
+	return r.Set(*value)
+}
+
+// Increment the required value of Sourness
+func (r userQuerySournessInt) Increment(value int) userWithPrismaSournessSetParam {
+	return userWithPrismaSournessSetParam{
+		data: builder.Field{
+			Name: "Sourness",
+			Fields: []builder.Field{
+				builder.Field{
+					Name:  "increment",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQuerySournessInt) IncrementIfPresent(value *int) userWithPrismaSournessSetParam {
+	if value == nil {
+		return userWithPrismaSournessSetParam{}
+	}
+	return r.Increment(*value)
+}
+
+// Decrement the required value of Sourness
+func (r userQuerySournessInt) Decrement(value int) userWithPrismaSournessSetParam {
+	return userWithPrismaSournessSetParam{
+		data: builder.Field{
+			Name: "Sourness",
+			Fields: []builder.Field{
+				builder.Field{
+					Name:  "decrement",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQuerySournessInt) DecrementIfPresent(value *int) userWithPrismaSournessSetParam {
+	if value == nil {
+		return userWithPrismaSournessSetParam{}
+	}
+	return r.Decrement(*value)
+}
+
+// Multiply the required value of Sourness
+func (r userQuerySournessInt) Multiply(value int) userWithPrismaSournessSetParam {
+	return userWithPrismaSournessSetParam{
+		data: builder.Field{
+			Name: "Sourness",
+			Fields: []builder.Field{
+				builder.Field{
+					Name:  "multiply",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQuerySournessInt) MultiplyIfPresent(value *int) userWithPrismaSournessSetParam {
+	if value == nil {
+		return userWithPrismaSournessSetParam{}
+	}
+	return r.Multiply(*value)
+}
+
+// Divide the required value of Sourness
+func (r userQuerySournessInt) Divide(value int) userWithPrismaSournessSetParam {
+	return userWithPrismaSournessSetParam{
+		data: builder.Field{
+			Name: "Sourness",
+			Fields: []builder.Field{
+				builder.Field{
+					Name:  "divide",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQuerySournessInt) DivideIfPresent(value *int) userWithPrismaSournessSetParam {
+	if value == nil {
+		return userWithPrismaSournessSetParam{}
+	}
+	return r.Divide(*value)
+}
+
+func (r userQuerySournessInt) Equals(value int) userWithPrismaSournessEqualsParam {
+
+	return userWithPrismaSournessEqualsParam{
+		data: builder.Field{
+			Name: "Sourness",
+			Fields: []builder.Field{
+				{
+					Name:  "equals",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQuerySournessInt) EqualsIfPresent(value *int) userWithPrismaSournessEqualsParam {
+	if value == nil {
+		return userWithPrismaSournessEqualsParam{}
+	}
+	return r.Equals(*value)
+}
+
+func (r userQuerySournessInt) Order(direction SortOrder) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name:  "Sourness",
+			Value: direction,
+		},
+	}
+}
+
+func (r userQuerySournessInt) Cursor(cursor int) userCursorParam {
+	return userCursorParam{
+		data: builder.Field{
+			Name:  "Sourness",
+			Value: cursor,
+		},
+	}
+}
+
+func (r userQuerySournessInt) In(value []int) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Sourness",
+			Fields: []builder.Field{
+				{
+					Name:  "in",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQuerySournessInt) InIfPresent(value []int) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.In(value)
+}
+
+func (r userQuerySournessInt) NotIn(value []int) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Sourness",
+			Fields: []builder.Field{
+				{
+					Name:  "notIn",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQuerySournessInt) NotInIfPresent(value []int) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.NotIn(value)
+}
+
+func (r userQuerySournessInt) Lt(value int) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Sourness",
+			Fields: []builder.Field{
+				{
+					Name:  "lt",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQuerySournessInt) LtIfPresent(value *int) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.Lt(*value)
+}
+
+func (r userQuerySournessInt) Lte(value int) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Sourness",
+			Fields: []builder.Field{
+				{
+					Name:  "lte",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQuerySournessInt) LteIfPresent(value *int) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.Lte(*value)
+}
+
+func (r userQuerySournessInt) Gt(value int) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Sourness",
+			Fields: []builder.Field{
+				{
+					Name:  "gt",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQuerySournessInt) GtIfPresent(value *int) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.Gt(*value)
+}
+
+func (r userQuerySournessInt) Gte(value int) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Sourness",
+			Fields: []builder.Field{
+				{
+					Name:  "gte",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQuerySournessInt) GteIfPresent(value *int) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.Gte(*value)
+}
+
+func (r userQuerySournessInt) Not(value int) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Sourness",
+			Fields: []builder.Field{
+				{
+					Name:  "not",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQuerySournessInt) NotIfPresent(value *int) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.Not(*value)
+}
+
+// deprecated: Use Lt instead.
+
+func (r userQuerySournessInt) LT(value int) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Sourness",
+			Fields: []builder.Field{
+				{
+					Name:  "lt",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+// deprecated: Use LtIfPresent instead.
+func (r userQuerySournessInt) LTIfPresent(value *int) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.LT(*value)
+}
+
+// deprecated: Use Lte instead.
+
+func (r userQuerySournessInt) LTE(value int) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Sourness",
+			Fields: []builder.Field{
+				{
+					Name:  "lte",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+// deprecated: Use LteIfPresent instead.
+func (r userQuerySournessInt) LTEIfPresent(value *int) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.LTE(*value)
+}
+
+// deprecated: Use Gt instead.
+
+func (r userQuerySournessInt) GT(value int) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Sourness",
+			Fields: []builder.Field{
+				{
+					Name:  "gt",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+// deprecated: Use GtIfPresent instead.
+func (r userQuerySournessInt) GTIfPresent(value *int) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.GT(*value)
+}
+
+// deprecated: Use Gte instead.
+
+func (r userQuerySournessInt) GTE(value int) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Sourness",
+			Fields: []builder.Field{
+				{
+					Name:  "gte",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+// deprecated: Use GteIfPresent instead.
+func (r userQuerySournessInt) GTEIfPresent(value *int) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.GTE(*value)
+}
+
+func (r userQuerySournessInt) Field() userPrismaFields {
+	return userFieldSourness
+}
+
+// base struct
+type userQueryTypeString struct{}
+
+// Set the required value of Type
+func (r userQueryTypeString) Set(value string) userWithPrismaTypeSetParam {
+
+	return userWithPrismaTypeSetParam{
+		data: builder.Field{
+			Name:  "Type",
+			Value: value,
+		},
+	}
+
+}
+
+// Set the optional value of Type dynamically
+func (r userQueryTypeString) SetIfPresent(value *String) userWithPrismaTypeSetParam {
+	if value == nil {
+		return userWithPrismaTypeSetParam{}
+	}
+
+	return r.Set(*value)
+}
+
+func (r userQueryTypeString) Equals(value string) userWithPrismaTypeEqualsParam {
+
+	return userWithPrismaTypeEqualsParam{
+		data: builder.Field{
+			Name: "Type",
+			Fields: []builder.Field{
+				{
+					Name:  "equals",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQueryTypeString) EqualsIfPresent(value *string) userWithPrismaTypeEqualsParam {
+	if value == nil {
+		return userWithPrismaTypeEqualsParam{}
+	}
+	return r.Equals(*value)
+}
+
+func (r userQueryTypeString) Order(direction SortOrder) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name:  "Type",
+			Value: direction,
+		},
+	}
+}
+
+func (r userQueryTypeString) Cursor(cursor string) userCursorParam {
+	return userCursorParam{
+		data: builder.Field{
+			Name:  "Type",
+			Value: cursor,
+		},
+	}
+}
+
+func (r userQueryTypeString) In(value []string) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Type",
+			Fields: []builder.Field{
+				{
+					Name:  "in",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQueryTypeString) InIfPresent(value []string) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.In(value)
+}
+
+func (r userQueryTypeString) NotIn(value []string) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Type",
+			Fields: []builder.Field{
+				{
+					Name:  "notIn",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQueryTypeString) NotInIfPresent(value []string) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.NotIn(value)
+}
+
+func (r userQueryTypeString) Lt(value string) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Type",
+			Fields: []builder.Field{
+				{
+					Name:  "lt",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQueryTypeString) LtIfPresent(value *string) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.Lt(*value)
+}
+
+func (r userQueryTypeString) Lte(value string) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Type",
+			Fields: []builder.Field{
+				{
+					Name:  "lte",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQueryTypeString) LteIfPresent(value *string) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.Lte(*value)
+}
+
+func (r userQueryTypeString) Gt(value string) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Type",
+			Fields: []builder.Field{
+				{
+					Name:  "gt",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQueryTypeString) GtIfPresent(value *string) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.Gt(*value)
+}
+
+func (r userQueryTypeString) Gte(value string) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Type",
+			Fields: []builder.Field{
+				{
+					Name:  "gte",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQueryTypeString) GteIfPresent(value *string) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.Gte(*value)
+}
+
+func (r userQueryTypeString) Contains(value string) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Type",
+			Fields: []builder.Field{
+				{
+					Name:  "contains",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQueryTypeString) ContainsIfPresent(value *string) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.Contains(*value)
+}
+
+func (r userQueryTypeString) StartsWith(value string) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Type",
+			Fields: []builder.Field{
+				{
+					Name:  "startsWith",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQueryTypeString) StartsWithIfPresent(value *string) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.StartsWith(*value)
+}
+
+func (r userQueryTypeString) EndsWith(value string) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Type",
+			Fields: []builder.Field{
+				{
+					Name:  "endsWith",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQueryTypeString) EndsWithIfPresent(value *string) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.EndsWith(*value)
+}
+
+func (r userQueryTypeString) Mode(value QueryMode) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Type",
+			Fields: []builder.Field{
+				{
+					Name:  "mode",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQueryTypeString) ModeIfPresent(value *QueryMode) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.Mode(*value)
+}
+
+func (r userQueryTypeString) Not(value string) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Type",
+			Fields: []builder.Field{
+				{
+					Name:  "not",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQueryTypeString) NotIfPresent(value *string) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.Not(*value)
+}
+
+// deprecated: Use StartsWith instead.
+
+func (r userQueryTypeString) HasPrefix(value string) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Type",
+			Fields: []builder.Field{
+				{
+					Name:  "starts_with",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+// deprecated: Use StartsWithIfPresent instead.
+func (r userQueryTypeString) HasPrefixIfPresent(value *string) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.HasPrefix(*value)
+}
+
+// deprecated: Use EndsWith instead.
+
+func (r userQueryTypeString) HasSuffix(value string) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Type",
+			Fields: []builder.Field{
+				{
+					Name:  "ends_with",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+// deprecated: Use EndsWithIfPresent instead.
+func (r userQueryTypeString) HasSuffixIfPresent(value *string) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.HasSuffix(*value)
+}
+
+func (r userQueryTypeString) Field() userPrismaFields {
+	return userFieldType
+}
+
+// base struct
+type userQueryAllergiesString struct{}
+
+// Set the required value of Allergies
+func (r userQueryAllergiesString) Set(value string) userWithPrismaAllergiesSetParam {
+
+	return userWithPrismaAllergiesSetParam{
+		data: builder.Field{
+			Name:  "Allergies",
+			Value: value,
+		},
+	}
+
+}
+
+// Set the optional value of Allergies dynamically
+func (r userQueryAllergiesString) SetIfPresent(value *String) userWithPrismaAllergiesSetParam {
+	if value == nil {
+		return userWithPrismaAllergiesSetParam{}
+	}
+
+	return r.Set(*value)
+}
+
+func (r userQueryAllergiesString) Equals(value string) userWithPrismaAllergiesEqualsParam {
+
+	return userWithPrismaAllergiesEqualsParam{
+		data: builder.Field{
+			Name: "Allergies",
+			Fields: []builder.Field{
+				{
+					Name:  "equals",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQueryAllergiesString) EqualsIfPresent(value *string) userWithPrismaAllergiesEqualsParam {
+	if value == nil {
+		return userWithPrismaAllergiesEqualsParam{}
+	}
+	return r.Equals(*value)
+}
+
+func (r userQueryAllergiesString) Order(direction SortOrder) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name:  "Allergies",
+			Value: direction,
+		},
+	}
+}
+
+func (r userQueryAllergiesString) Cursor(cursor string) userCursorParam {
+	return userCursorParam{
+		data: builder.Field{
+			Name:  "Allergies",
+			Value: cursor,
+		},
+	}
+}
+
+func (r userQueryAllergiesString) In(value []string) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Allergies",
+			Fields: []builder.Field{
+				{
+					Name:  "in",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQueryAllergiesString) InIfPresent(value []string) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.In(value)
+}
+
+func (r userQueryAllergiesString) NotIn(value []string) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Allergies",
+			Fields: []builder.Field{
+				{
+					Name:  "notIn",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQueryAllergiesString) NotInIfPresent(value []string) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.NotIn(value)
+}
+
+func (r userQueryAllergiesString) Lt(value string) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Allergies",
+			Fields: []builder.Field{
+				{
+					Name:  "lt",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQueryAllergiesString) LtIfPresent(value *string) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.Lt(*value)
+}
+
+func (r userQueryAllergiesString) Lte(value string) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Allergies",
+			Fields: []builder.Field{
+				{
+					Name:  "lte",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQueryAllergiesString) LteIfPresent(value *string) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.Lte(*value)
+}
+
+func (r userQueryAllergiesString) Gt(value string) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Allergies",
+			Fields: []builder.Field{
+				{
+					Name:  "gt",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQueryAllergiesString) GtIfPresent(value *string) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.Gt(*value)
+}
+
+func (r userQueryAllergiesString) Gte(value string) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Allergies",
+			Fields: []builder.Field{
+				{
+					Name:  "gte",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQueryAllergiesString) GteIfPresent(value *string) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.Gte(*value)
+}
+
+func (r userQueryAllergiesString) Contains(value string) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Allergies",
+			Fields: []builder.Field{
+				{
+					Name:  "contains",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQueryAllergiesString) ContainsIfPresent(value *string) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.Contains(*value)
+}
+
+func (r userQueryAllergiesString) StartsWith(value string) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Allergies",
+			Fields: []builder.Field{
+				{
+					Name:  "startsWith",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQueryAllergiesString) StartsWithIfPresent(value *string) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.StartsWith(*value)
+}
+
+func (r userQueryAllergiesString) EndsWith(value string) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Allergies",
+			Fields: []builder.Field{
+				{
+					Name:  "endsWith",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQueryAllergiesString) EndsWithIfPresent(value *string) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.EndsWith(*value)
+}
+
+func (r userQueryAllergiesString) Mode(value QueryMode) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Allergies",
+			Fields: []builder.Field{
+				{
+					Name:  "mode",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQueryAllergiesString) ModeIfPresent(value *QueryMode) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.Mode(*value)
+}
+
+func (r userQueryAllergiesString) Not(value string) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Allergies",
+			Fields: []builder.Field{
+				{
+					Name:  "not",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQueryAllergiesString) NotIfPresent(value *string) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.Not(*value)
+}
+
+// deprecated: Use StartsWith instead.
+
+func (r userQueryAllergiesString) HasPrefix(value string) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Allergies",
+			Fields: []builder.Field{
+				{
+					Name:  "starts_with",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+// deprecated: Use StartsWithIfPresent instead.
+func (r userQueryAllergiesString) HasPrefixIfPresent(value *string) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.HasPrefix(*value)
+}
+
+// deprecated: Use EndsWith instead.
+
+func (r userQueryAllergiesString) HasSuffix(value string) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "Allergies",
+			Fields: []builder.Field{
+				{
+					Name:  "ends_with",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+// deprecated: Use EndsWithIfPresent instead.
+func (r userQueryAllergiesString) HasSuffixIfPresent(value *string) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.HasSuffix(*value)
+}
+
+func (r userQueryAllergiesString) Field() userPrismaFields {
+	return userFieldAllergies
+}
+
+// base struct
+type userQueryCityString struct{}
+
+// Set the required value of City
+func (r userQueryCityString) Set(value string) userWithPrismaCitySetParam {
+
+	return userWithPrismaCitySetParam{
+		data: builder.Field{
+			Name:  "City",
+			Value: value,
+		},
+	}
+
+}
+
+// Set the optional value of City dynamically
+func (r userQueryCityString) SetIfPresent(value *String) userWithPrismaCitySetParam {
+	if value == nil {
+		return userWithPrismaCitySetParam{}
+	}
+
+	return r.Set(*value)
+}
+
+func (r userQueryCityString) Equals(value string) userWithPrismaCityEqualsParam {
+
+	return userWithPrismaCityEqualsParam{
+		data: builder.Field{
+			Name: "City",
+			Fields: []builder.Field{
+				{
+					Name:  "equals",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQueryCityString) EqualsIfPresent(value *string) userWithPrismaCityEqualsParam {
+	if value == nil {
+		return userWithPrismaCityEqualsParam{}
+	}
+	return r.Equals(*value)
+}
+
+func (r userQueryCityString) Order(direction SortOrder) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name:  "City",
+			Value: direction,
+		},
+	}
+}
+
+func (r userQueryCityString) Cursor(cursor string) userCursorParam {
+	return userCursorParam{
+		data: builder.Field{
+			Name:  "City",
+			Value: cursor,
+		},
+	}
+}
+
+func (r userQueryCityString) In(value []string) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "City",
+			Fields: []builder.Field{
+				{
+					Name:  "in",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQueryCityString) InIfPresent(value []string) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.In(value)
+}
+
+func (r userQueryCityString) NotIn(value []string) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "City",
+			Fields: []builder.Field{
+				{
+					Name:  "notIn",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQueryCityString) NotInIfPresent(value []string) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.NotIn(value)
+}
+
+func (r userQueryCityString) Lt(value string) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "City",
+			Fields: []builder.Field{
+				{
+					Name:  "lt",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQueryCityString) LtIfPresent(value *string) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.Lt(*value)
+}
+
+func (r userQueryCityString) Lte(value string) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "City",
+			Fields: []builder.Field{
+				{
+					Name:  "lte",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQueryCityString) LteIfPresent(value *string) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.Lte(*value)
+}
+
+func (r userQueryCityString) Gt(value string) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "City",
+			Fields: []builder.Field{
+				{
+					Name:  "gt",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQueryCityString) GtIfPresent(value *string) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.Gt(*value)
+}
+
+func (r userQueryCityString) Gte(value string) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "City",
+			Fields: []builder.Field{
+				{
+					Name:  "gte",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQueryCityString) GteIfPresent(value *string) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.Gte(*value)
+}
+
+func (r userQueryCityString) Contains(value string) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "City",
+			Fields: []builder.Field{
+				{
+					Name:  "contains",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQueryCityString) ContainsIfPresent(value *string) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.Contains(*value)
+}
+
+func (r userQueryCityString) StartsWith(value string) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "City",
+			Fields: []builder.Field{
+				{
+					Name:  "startsWith",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQueryCityString) StartsWithIfPresent(value *string) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.StartsWith(*value)
+}
+
+func (r userQueryCityString) EndsWith(value string) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "City",
+			Fields: []builder.Field{
+				{
+					Name:  "endsWith",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQueryCityString) EndsWithIfPresent(value *string) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.EndsWith(*value)
+}
+
+func (r userQueryCityString) Mode(value QueryMode) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "City",
+			Fields: []builder.Field{
+				{
+					Name:  "mode",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQueryCityString) ModeIfPresent(value *QueryMode) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.Mode(*value)
+}
+
+func (r userQueryCityString) Not(value string) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "City",
+			Fields: []builder.Field{
+				{
+					Name:  "not",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r userQueryCityString) NotIfPresent(value *string) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.Not(*value)
+}
+
+// deprecated: Use StartsWith instead.
+
+func (r userQueryCityString) HasPrefix(value string) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "City",
+			Fields: []builder.Field{
+				{
+					Name:  "starts_with",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+// deprecated: Use StartsWithIfPresent instead.
+func (r userQueryCityString) HasPrefixIfPresent(value *string) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.HasPrefix(*value)
+}
+
+// deprecated: Use EndsWith instead.
+
+func (r userQueryCityString) HasSuffix(value string) userDefaultParam {
+	return userDefaultParam{
+		data: builder.Field{
+			Name: "City",
+			Fields: []builder.Field{
+				{
+					Name:  "ends_with",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+// deprecated: Use EndsWithIfPresent instead.
+func (r userQueryCityString) HasSuffixIfPresent(value *string) userDefaultParam {
+	if value == nil {
+		return userDefaultParam{}
+	}
+	return r.HasSuffix(*value)
+}
+
+func (r userQueryCityString) Field() userPrismaFields {
+	return userFieldCity
+}
+
+// base struct
 type userQueryPostsPost struct{}
 
 type userQueryPostsRelations struct{}
@@ -5288,6 +7628,36 @@ type postQuery struct {
 	//
 	// @required
 	Latitude postQueryLatitudeString
+
+	// Cuisine
+	//
+	// @required
+	Cuisine postQueryCuisineString
+
+	// Dish
+	//
+	// @required
+	Dish postQueryDishString
+
+	// Type
+	//
+	// @required
+	Type postQueryTypeString
+
+	// Spiciness
+	//
+	// @required
+	Spiciness postQuerySpicinessInt
+
+	// Sweetness
+	//
+	// @required
+	Sweetness postQuerySweetnessInt
+
+	// Sourness
+	//
+	// @required
+	Sourness postQuerySournessInt
 
 	// Pictures
 	//
@@ -7735,6 +10105,2244 @@ func (r postQueryLatitudeString) HasSuffixIfPresent(value *string) postDefaultPa
 
 func (r postQueryLatitudeString) Field() postPrismaFields {
 	return postFieldLatitude
+}
+
+// base struct
+type postQueryCuisineString struct{}
+
+// Set the required value of Cuisine
+func (r postQueryCuisineString) Set(value string) postWithPrismaCuisineSetParam {
+
+	return postWithPrismaCuisineSetParam{
+		data: builder.Field{
+			Name:  "Cuisine",
+			Value: value,
+		},
+	}
+
+}
+
+// Set the optional value of Cuisine dynamically
+func (r postQueryCuisineString) SetIfPresent(value *String) postWithPrismaCuisineSetParam {
+	if value == nil {
+		return postWithPrismaCuisineSetParam{}
+	}
+
+	return r.Set(*value)
+}
+
+func (r postQueryCuisineString) Equals(value string) postWithPrismaCuisineEqualsParam {
+
+	return postWithPrismaCuisineEqualsParam{
+		data: builder.Field{
+			Name: "Cuisine",
+			Fields: []builder.Field{
+				{
+					Name:  "equals",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryCuisineString) EqualsIfPresent(value *string) postWithPrismaCuisineEqualsParam {
+	if value == nil {
+		return postWithPrismaCuisineEqualsParam{}
+	}
+	return r.Equals(*value)
+}
+
+func (r postQueryCuisineString) Order(direction SortOrder) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name:  "Cuisine",
+			Value: direction,
+		},
+	}
+}
+
+func (r postQueryCuisineString) Cursor(cursor string) postCursorParam {
+	return postCursorParam{
+		data: builder.Field{
+			Name:  "Cuisine",
+			Value: cursor,
+		},
+	}
+}
+
+func (r postQueryCuisineString) In(value []string) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Cuisine",
+			Fields: []builder.Field{
+				{
+					Name:  "in",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryCuisineString) InIfPresent(value []string) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.In(value)
+}
+
+func (r postQueryCuisineString) NotIn(value []string) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Cuisine",
+			Fields: []builder.Field{
+				{
+					Name:  "notIn",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryCuisineString) NotInIfPresent(value []string) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.NotIn(value)
+}
+
+func (r postQueryCuisineString) Lt(value string) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Cuisine",
+			Fields: []builder.Field{
+				{
+					Name:  "lt",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryCuisineString) LtIfPresent(value *string) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.Lt(*value)
+}
+
+func (r postQueryCuisineString) Lte(value string) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Cuisine",
+			Fields: []builder.Field{
+				{
+					Name:  "lte",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryCuisineString) LteIfPresent(value *string) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.Lte(*value)
+}
+
+func (r postQueryCuisineString) Gt(value string) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Cuisine",
+			Fields: []builder.Field{
+				{
+					Name:  "gt",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryCuisineString) GtIfPresent(value *string) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.Gt(*value)
+}
+
+func (r postQueryCuisineString) Gte(value string) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Cuisine",
+			Fields: []builder.Field{
+				{
+					Name:  "gte",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryCuisineString) GteIfPresent(value *string) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.Gte(*value)
+}
+
+func (r postQueryCuisineString) Contains(value string) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Cuisine",
+			Fields: []builder.Field{
+				{
+					Name:  "contains",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryCuisineString) ContainsIfPresent(value *string) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.Contains(*value)
+}
+
+func (r postQueryCuisineString) StartsWith(value string) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Cuisine",
+			Fields: []builder.Field{
+				{
+					Name:  "startsWith",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryCuisineString) StartsWithIfPresent(value *string) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.StartsWith(*value)
+}
+
+func (r postQueryCuisineString) EndsWith(value string) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Cuisine",
+			Fields: []builder.Field{
+				{
+					Name:  "endsWith",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryCuisineString) EndsWithIfPresent(value *string) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.EndsWith(*value)
+}
+
+func (r postQueryCuisineString) Mode(value QueryMode) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Cuisine",
+			Fields: []builder.Field{
+				{
+					Name:  "mode",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryCuisineString) ModeIfPresent(value *QueryMode) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.Mode(*value)
+}
+
+func (r postQueryCuisineString) Not(value string) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Cuisine",
+			Fields: []builder.Field{
+				{
+					Name:  "not",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryCuisineString) NotIfPresent(value *string) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.Not(*value)
+}
+
+// deprecated: Use StartsWith instead.
+
+func (r postQueryCuisineString) HasPrefix(value string) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Cuisine",
+			Fields: []builder.Field{
+				{
+					Name:  "starts_with",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+// deprecated: Use StartsWithIfPresent instead.
+func (r postQueryCuisineString) HasPrefixIfPresent(value *string) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.HasPrefix(*value)
+}
+
+// deprecated: Use EndsWith instead.
+
+func (r postQueryCuisineString) HasSuffix(value string) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Cuisine",
+			Fields: []builder.Field{
+				{
+					Name:  "ends_with",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+// deprecated: Use EndsWithIfPresent instead.
+func (r postQueryCuisineString) HasSuffixIfPresent(value *string) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.HasSuffix(*value)
+}
+
+func (r postQueryCuisineString) Field() postPrismaFields {
+	return postFieldCuisine
+}
+
+// base struct
+type postQueryDishString struct{}
+
+// Set the required value of Dish
+func (r postQueryDishString) Set(value string) postWithPrismaDishSetParam {
+
+	return postWithPrismaDishSetParam{
+		data: builder.Field{
+			Name:  "Dish",
+			Value: value,
+		},
+	}
+
+}
+
+// Set the optional value of Dish dynamically
+func (r postQueryDishString) SetIfPresent(value *String) postWithPrismaDishSetParam {
+	if value == nil {
+		return postWithPrismaDishSetParam{}
+	}
+
+	return r.Set(*value)
+}
+
+func (r postQueryDishString) Equals(value string) postWithPrismaDishEqualsParam {
+
+	return postWithPrismaDishEqualsParam{
+		data: builder.Field{
+			Name: "Dish",
+			Fields: []builder.Field{
+				{
+					Name:  "equals",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryDishString) EqualsIfPresent(value *string) postWithPrismaDishEqualsParam {
+	if value == nil {
+		return postWithPrismaDishEqualsParam{}
+	}
+	return r.Equals(*value)
+}
+
+func (r postQueryDishString) Order(direction SortOrder) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name:  "Dish",
+			Value: direction,
+		},
+	}
+}
+
+func (r postQueryDishString) Cursor(cursor string) postCursorParam {
+	return postCursorParam{
+		data: builder.Field{
+			Name:  "Dish",
+			Value: cursor,
+		},
+	}
+}
+
+func (r postQueryDishString) In(value []string) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Dish",
+			Fields: []builder.Field{
+				{
+					Name:  "in",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryDishString) InIfPresent(value []string) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.In(value)
+}
+
+func (r postQueryDishString) NotIn(value []string) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Dish",
+			Fields: []builder.Field{
+				{
+					Name:  "notIn",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryDishString) NotInIfPresent(value []string) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.NotIn(value)
+}
+
+func (r postQueryDishString) Lt(value string) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Dish",
+			Fields: []builder.Field{
+				{
+					Name:  "lt",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryDishString) LtIfPresent(value *string) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.Lt(*value)
+}
+
+func (r postQueryDishString) Lte(value string) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Dish",
+			Fields: []builder.Field{
+				{
+					Name:  "lte",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryDishString) LteIfPresent(value *string) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.Lte(*value)
+}
+
+func (r postQueryDishString) Gt(value string) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Dish",
+			Fields: []builder.Field{
+				{
+					Name:  "gt",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryDishString) GtIfPresent(value *string) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.Gt(*value)
+}
+
+func (r postQueryDishString) Gte(value string) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Dish",
+			Fields: []builder.Field{
+				{
+					Name:  "gte",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryDishString) GteIfPresent(value *string) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.Gte(*value)
+}
+
+func (r postQueryDishString) Contains(value string) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Dish",
+			Fields: []builder.Field{
+				{
+					Name:  "contains",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryDishString) ContainsIfPresent(value *string) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.Contains(*value)
+}
+
+func (r postQueryDishString) StartsWith(value string) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Dish",
+			Fields: []builder.Field{
+				{
+					Name:  "startsWith",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryDishString) StartsWithIfPresent(value *string) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.StartsWith(*value)
+}
+
+func (r postQueryDishString) EndsWith(value string) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Dish",
+			Fields: []builder.Field{
+				{
+					Name:  "endsWith",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryDishString) EndsWithIfPresent(value *string) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.EndsWith(*value)
+}
+
+func (r postQueryDishString) Mode(value QueryMode) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Dish",
+			Fields: []builder.Field{
+				{
+					Name:  "mode",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryDishString) ModeIfPresent(value *QueryMode) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.Mode(*value)
+}
+
+func (r postQueryDishString) Not(value string) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Dish",
+			Fields: []builder.Field{
+				{
+					Name:  "not",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryDishString) NotIfPresent(value *string) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.Not(*value)
+}
+
+// deprecated: Use StartsWith instead.
+
+func (r postQueryDishString) HasPrefix(value string) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Dish",
+			Fields: []builder.Field{
+				{
+					Name:  "starts_with",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+// deprecated: Use StartsWithIfPresent instead.
+func (r postQueryDishString) HasPrefixIfPresent(value *string) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.HasPrefix(*value)
+}
+
+// deprecated: Use EndsWith instead.
+
+func (r postQueryDishString) HasSuffix(value string) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Dish",
+			Fields: []builder.Field{
+				{
+					Name:  "ends_with",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+// deprecated: Use EndsWithIfPresent instead.
+func (r postQueryDishString) HasSuffixIfPresent(value *string) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.HasSuffix(*value)
+}
+
+func (r postQueryDishString) Field() postPrismaFields {
+	return postFieldDish
+}
+
+// base struct
+type postQueryTypeString struct{}
+
+// Set the required value of Type
+func (r postQueryTypeString) Set(value string) postWithPrismaTypeSetParam {
+
+	return postWithPrismaTypeSetParam{
+		data: builder.Field{
+			Name:  "Type",
+			Value: value,
+		},
+	}
+
+}
+
+// Set the optional value of Type dynamically
+func (r postQueryTypeString) SetIfPresent(value *String) postWithPrismaTypeSetParam {
+	if value == nil {
+		return postWithPrismaTypeSetParam{}
+	}
+
+	return r.Set(*value)
+}
+
+func (r postQueryTypeString) Equals(value string) postWithPrismaTypeEqualsParam {
+
+	return postWithPrismaTypeEqualsParam{
+		data: builder.Field{
+			Name: "Type",
+			Fields: []builder.Field{
+				{
+					Name:  "equals",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryTypeString) EqualsIfPresent(value *string) postWithPrismaTypeEqualsParam {
+	if value == nil {
+		return postWithPrismaTypeEqualsParam{}
+	}
+	return r.Equals(*value)
+}
+
+func (r postQueryTypeString) Order(direction SortOrder) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name:  "Type",
+			Value: direction,
+		},
+	}
+}
+
+func (r postQueryTypeString) Cursor(cursor string) postCursorParam {
+	return postCursorParam{
+		data: builder.Field{
+			Name:  "Type",
+			Value: cursor,
+		},
+	}
+}
+
+func (r postQueryTypeString) In(value []string) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Type",
+			Fields: []builder.Field{
+				{
+					Name:  "in",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryTypeString) InIfPresent(value []string) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.In(value)
+}
+
+func (r postQueryTypeString) NotIn(value []string) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Type",
+			Fields: []builder.Field{
+				{
+					Name:  "notIn",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryTypeString) NotInIfPresent(value []string) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.NotIn(value)
+}
+
+func (r postQueryTypeString) Lt(value string) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Type",
+			Fields: []builder.Field{
+				{
+					Name:  "lt",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryTypeString) LtIfPresent(value *string) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.Lt(*value)
+}
+
+func (r postQueryTypeString) Lte(value string) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Type",
+			Fields: []builder.Field{
+				{
+					Name:  "lte",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryTypeString) LteIfPresent(value *string) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.Lte(*value)
+}
+
+func (r postQueryTypeString) Gt(value string) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Type",
+			Fields: []builder.Field{
+				{
+					Name:  "gt",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryTypeString) GtIfPresent(value *string) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.Gt(*value)
+}
+
+func (r postQueryTypeString) Gte(value string) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Type",
+			Fields: []builder.Field{
+				{
+					Name:  "gte",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryTypeString) GteIfPresent(value *string) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.Gte(*value)
+}
+
+func (r postQueryTypeString) Contains(value string) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Type",
+			Fields: []builder.Field{
+				{
+					Name:  "contains",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryTypeString) ContainsIfPresent(value *string) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.Contains(*value)
+}
+
+func (r postQueryTypeString) StartsWith(value string) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Type",
+			Fields: []builder.Field{
+				{
+					Name:  "startsWith",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryTypeString) StartsWithIfPresent(value *string) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.StartsWith(*value)
+}
+
+func (r postQueryTypeString) EndsWith(value string) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Type",
+			Fields: []builder.Field{
+				{
+					Name:  "endsWith",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryTypeString) EndsWithIfPresent(value *string) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.EndsWith(*value)
+}
+
+func (r postQueryTypeString) Mode(value QueryMode) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Type",
+			Fields: []builder.Field{
+				{
+					Name:  "mode",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryTypeString) ModeIfPresent(value *QueryMode) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.Mode(*value)
+}
+
+func (r postQueryTypeString) Not(value string) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Type",
+			Fields: []builder.Field{
+				{
+					Name:  "not",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQueryTypeString) NotIfPresent(value *string) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.Not(*value)
+}
+
+// deprecated: Use StartsWith instead.
+
+func (r postQueryTypeString) HasPrefix(value string) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Type",
+			Fields: []builder.Field{
+				{
+					Name:  "starts_with",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+// deprecated: Use StartsWithIfPresent instead.
+func (r postQueryTypeString) HasPrefixIfPresent(value *string) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.HasPrefix(*value)
+}
+
+// deprecated: Use EndsWith instead.
+
+func (r postQueryTypeString) HasSuffix(value string) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Type",
+			Fields: []builder.Field{
+				{
+					Name:  "ends_with",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+// deprecated: Use EndsWithIfPresent instead.
+func (r postQueryTypeString) HasSuffixIfPresent(value *string) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.HasSuffix(*value)
+}
+
+func (r postQueryTypeString) Field() postPrismaFields {
+	return postFieldType
+}
+
+// base struct
+type postQuerySpicinessInt struct{}
+
+// Set the required value of Spiciness
+func (r postQuerySpicinessInt) Set(value int) postWithPrismaSpicinessSetParam {
+
+	return postWithPrismaSpicinessSetParam{
+		data: builder.Field{
+			Name:  "Spiciness",
+			Value: value,
+		},
+	}
+
+}
+
+// Set the optional value of Spiciness dynamically
+func (r postQuerySpicinessInt) SetIfPresent(value *Int) postWithPrismaSpicinessSetParam {
+	if value == nil {
+		return postWithPrismaSpicinessSetParam{}
+	}
+
+	return r.Set(*value)
+}
+
+// Increment the required value of Spiciness
+func (r postQuerySpicinessInt) Increment(value int) postWithPrismaSpicinessSetParam {
+	return postWithPrismaSpicinessSetParam{
+		data: builder.Field{
+			Name: "Spiciness",
+			Fields: []builder.Field{
+				builder.Field{
+					Name:  "increment",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQuerySpicinessInt) IncrementIfPresent(value *int) postWithPrismaSpicinessSetParam {
+	if value == nil {
+		return postWithPrismaSpicinessSetParam{}
+	}
+	return r.Increment(*value)
+}
+
+// Decrement the required value of Spiciness
+func (r postQuerySpicinessInt) Decrement(value int) postWithPrismaSpicinessSetParam {
+	return postWithPrismaSpicinessSetParam{
+		data: builder.Field{
+			Name: "Spiciness",
+			Fields: []builder.Field{
+				builder.Field{
+					Name:  "decrement",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQuerySpicinessInt) DecrementIfPresent(value *int) postWithPrismaSpicinessSetParam {
+	if value == nil {
+		return postWithPrismaSpicinessSetParam{}
+	}
+	return r.Decrement(*value)
+}
+
+// Multiply the required value of Spiciness
+func (r postQuerySpicinessInt) Multiply(value int) postWithPrismaSpicinessSetParam {
+	return postWithPrismaSpicinessSetParam{
+		data: builder.Field{
+			Name: "Spiciness",
+			Fields: []builder.Field{
+				builder.Field{
+					Name:  "multiply",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQuerySpicinessInt) MultiplyIfPresent(value *int) postWithPrismaSpicinessSetParam {
+	if value == nil {
+		return postWithPrismaSpicinessSetParam{}
+	}
+	return r.Multiply(*value)
+}
+
+// Divide the required value of Spiciness
+func (r postQuerySpicinessInt) Divide(value int) postWithPrismaSpicinessSetParam {
+	return postWithPrismaSpicinessSetParam{
+		data: builder.Field{
+			Name: "Spiciness",
+			Fields: []builder.Field{
+				builder.Field{
+					Name:  "divide",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQuerySpicinessInt) DivideIfPresent(value *int) postWithPrismaSpicinessSetParam {
+	if value == nil {
+		return postWithPrismaSpicinessSetParam{}
+	}
+	return r.Divide(*value)
+}
+
+func (r postQuerySpicinessInt) Equals(value int) postWithPrismaSpicinessEqualsParam {
+
+	return postWithPrismaSpicinessEqualsParam{
+		data: builder.Field{
+			Name: "Spiciness",
+			Fields: []builder.Field{
+				{
+					Name:  "equals",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQuerySpicinessInt) EqualsIfPresent(value *int) postWithPrismaSpicinessEqualsParam {
+	if value == nil {
+		return postWithPrismaSpicinessEqualsParam{}
+	}
+	return r.Equals(*value)
+}
+
+func (r postQuerySpicinessInt) Order(direction SortOrder) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name:  "Spiciness",
+			Value: direction,
+		},
+	}
+}
+
+func (r postQuerySpicinessInt) Cursor(cursor int) postCursorParam {
+	return postCursorParam{
+		data: builder.Field{
+			Name:  "Spiciness",
+			Value: cursor,
+		},
+	}
+}
+
+func (r postQuerySpicinessInt) In(value []int) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Spiciness",
+			Fields: []builder.Field{
+				{
+					Name:  "in",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQuerySpicinessInt) InIfPresent(value []int) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.In(value)
+}
+
+func (r postQuerySpicinessInt) NotIn(value []int) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Spiciness",
+			Fields: []builder.Field{
+				{
+					Name:  "notIn",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQuerySpicinessInt) NotInIfPresent(value []int) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.NotIn(value)
+}
+
+func (r postQuerySpicinessInt) Lt(value int) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Spiciness",
+			Fields: []builder.Field{
+				{
+					Name:  "lt",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQuerySpicinessInt) LtIfPresent(value *int) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.Lt(*value)
+}
+
+func (r postQuerySpicinessInt) Lte(value int) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Spiciness",
+			Fields: []builder.Field{
+				{
+					Name:  "lte",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQuerySpicinessInt) LteIfPresent(value *int) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.Lte(*value)
+}
+
+func (r postQuerySpicinessInt) Gt(value int) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Spiciness",
+			Fields: []builder.Field{
+				{
+					Name:  "gt",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQuerySpicinessInt) GtIfPresent(value *int) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.Gt(*value)
+}
+
+func (r postQuerySpicinessInt) Gte(value int) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Spiciness",
+			Fields: []builder.Field{
+				{
+					Name:  "gte",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQuerySpicinessInt) GteIfPresent(value *int) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.Gte(*value)
+}
+
+func (r postQuerySpicinessInt) Not(value int) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Spiciness",
+			Fields: []builder.Field{
+				{
+					Name:  "not",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQuerySpicinessInt) NotIfPresent(value *int) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.Not(*value)
+}
+
+// deprecated: Use Lt instead.
+
+func (r postQuerySpicinessInt) LT(value int) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Spiciness",
+			Fields: []builder.Field{
+				{
+					Name:  "lt",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+// deprecated: Use LtIfPresent instead.
+func (r postQuerySpicinessInt) LTIfPresent(value *int) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.LT(*value)
+}
+
+// deprecated: Use Lte instead.
+
+func (r postQuerySpicinessInt) LTE(value int) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Spiciness",
+			Fields: []builder.Field{
+				{
+					Name:  "lte",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+// deprecated: Use LteIfPresent instead.
+func (r postQuerySpicinessInt) LTEIfPresent(value *int) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.LTE(*value)
+}
+
+// deprecated: Use Gt instead.
+
+func (r postQuerySpicinessInt) GT(value int) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Spiciness",
+			Fields: []builder.Field{
+				{
+					Name:  "gt",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+// deprecated: Use GtIfPresent instead.
+func (r postQuerySpicinessInt) GTIfPresent(value *int) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.GT(*value)
+}
+
+// deprecated: Use Gte instead.
+
+func (r postQuerySpicinessInt) GTE(value int) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Spiciness",
+			Fields: []builder.Field{
+				{
+					Name:  "gte",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+// deprecated: Use GteIfPresent instead.
+func (r postQuerySpicinessInt) GTEIfPresent(value *int) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.GTE(*value)
+}
+
+func (r postQuerySpicinessInt) Field() postPrismaFields {
+	return postFieldSpiciness
+}
+
+// base struct
+type postQuerySweetnessInt struct{}
+
+// Set the required value of Sweetness
+func (r postQuerySweetnessInt) Set(value int) postWithPrismaSweetnessSetParam {
+
+	return postWithPrismaSweetnessSetParam{
+		data: builder.Field{
+			Name:  "Sweetness",
+			Value: value,
+		},
+	}
+
+}
+
+// Set the optional value of Sweetness dynamically
+func (r postQuerySweetnessInt) SetIfPresent(value *Int) postWithPrismaSweetnessSetParam {
+	if value == nil {
+		return postWithPrismaSweetnessSetParam{}
+	}
+
+	return r.Set(*value)
+}
+
+// Increment the required value of Sweetness
+func (r postQuerySweetnessInt) Increment(value int) postWithPrismaSweetnessSetParam {
+	return postWithPrismaSweetnessSetParam{
+		data: builder.Field{
+			Name: "Sweetness",
+			Fields: []builder.Field{
+				builder.Field{
+					Name:  "increment",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQuerySweetnessInt) IncrementIfPresent(value *int) postWithPrismaSweetnessSetParam {
+	if value == nil {
+		return postWithPrismaSweetnessSetParam{}
+	}
+	return r.Increment(*value)
+}
+
+// Decrement the required value of Sweetness
+func (r postQuerySweetnessInt) Decrement(value int) postWithPrismaSweetnessSetParam {
+	return postWithPrismaSweetnessSetParam{
+		data: builder.Field{
+			Name: "Sweetness",
+			Fields: []builder.Field{
+				builder.Field{
+					Name:  "decrement",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQuerySweetnessInt) DecrementIfPresent(value *int) postWithPrismaSweetnessSetParam {
+	if value == nil {
+		return postWithPrismaSweetnessSetParam{}
+	}
+	return r.Decrement(*value)
+}
+
+// Multiply the required value of Sweetness
+func (r postQuerySweetnessInt) Multiply(value int) postWithPrismaSweetnessSetParam {
+	return postWithPrismaSweetnessSetParam{
+		data: builder.Field{
+			Name: "Sweetness",
+			Fields: []builder.Field{
+				builder.Field{
+					Name:  "multiply",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQuerySweetnessInt) MultiplyIfPresent(value *int) postWithPrismaSweetnessSetParam {
+	if value == nil {
+		return postWithPrismaSweetnessSetParam{}
+	}
+	return r.Multiply(*value)
+}
+
+// Divide the required value of Sweetness
+func (r postQuerySweetnessInt) Divide(value int) postWithPrismaSweetnessSetParam {
+	return postWithPrismaSweetnessSetParam{
+		data: builder.Field{
+			Name: "Sweetness",
+			Fields: []builder.Field{
+				builder.Field{
+					Name:  "divide",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQuerySweetnessInt) DivideIfPresent(value *int) postWithPrismaSweetnessSetParam {
+	if value == nil {
+		return postWithPrismaSweetnessSetParam{}
+	}
+	return r.Divide(*value)
+}
+
+func (r postQuerySweetnessInt) Equals(value int) postWithPrismaSweetnessEqualsParam {
+
+	return postWithPrismaSweetnessEqualsParam{
+		data: builder.Field{
+			Name: "Sweetness",
+			Fields: []builder.Field{
+				{
+					Name:  "equals",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQuerySweetnessInt) EqualsIfPresent(value *int) postWithPrismaSweetnessEqualsParam {
+	if value == nil {
+		return postWithPrismaSweetnessEqualsParam{}
+	}
+	return r.Equals(*value)
+}
+
+func (r postQuerySweetnessInt) Order(direction SortOrder) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name:  "Sweetness",
+			Value: direction,
+		},
+	}
+}
+
+func (r postQuerySweetnessInt) Cursor(cursor int) postCursorParam {
+	return postCursorParam{
+		data: builder.Field{
+			Name:  "Sweetness",
+			Value: cursor,
+		},
+	}
+}
+
+func (r postQuerySweetnessInt) In(value []int) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Sweetness",
+			Fields: []builder.Field{
+				{
+					Name:  "in",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQuerySweetnessInt) InIfPresent(value []int) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.In(value)
+}
+
+func (r postQuerySweetnessInt) NotIn(value []int) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Sweetness",
+			Fields: []builder.Field{
+				{
+					Name:  "notIn",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQuerySweetnessInt) NotInIfPresent(value []int) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.NotIn(value)
+}
+
+func (r postQuerySweetnessInt) Lt(value int) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Sweetness",
+			Fields: []builder.Field{
+				{
+					Name:  "lt",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQuerySweetnessInt) LtIfPresent(value *int) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.Lt(*value)
+}
+
+func (r postQuerySweetnessInt) Lte(value int) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Sweetness",
+			Fields: []builder.Field{
+				{
+					Name:  "lte",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQuerySweetnessInt) LteIfPresent(value *int) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.Lte(*value)
+}
+
+func (r postQuerySweetnessInt) Gt(value int) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Sweetness",
+			Fields: []builder.Field{
+				{
+					Name:  "gt",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQuerySweetnessInt) GtIfPresent(value *int) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.Gt(*value)
+}
+
+func (r postQuerySweetnessInt) Gte(value int) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Sweetness",
+			Fields: []builder.Field{
+				{
+					Name:  "gte",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQuerySweetnessInt) GteIfPresent(value *int) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.Gte(*value)
+}
+
+func (r postQuerySweetnessInt) Not(value int) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Sweetness",
+			Fields: []builder.Field{
+				{
+					Name:  "not",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQuerySweetnessInt) NotIfPresent(value *int) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.Not(*value)
+}
+
+// deprecated: Use Lt instead.
+
+func (r postQuerySweetnessInt) LT(value int) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Sweetness",
+			Fields: []builder.Field{
+				{
+					Name:  "lt",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+// deprecated: Use LtIfPresent instead.
+func (r postQuerySweetnessInt) LTIfPresent(value *int) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.LT(*value)
+}
+
+// deprecated: Use Lte instead.
+
+func (r postQuerySweetnessInt) LTE(value int) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Sweetness",
+			Fields: []builder.Field{
+				{
+					Name:  "lte",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+// deprecated: Use LteIfPresent instead.
+func (r postQuerySweetnessInt) LTEIfPresent(value *int) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.LTE(*value)
+}
+
+// deprecated: Use Gt instead.
+
+func (r postQuerySweetnessInt) GT(value int) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Sweetness",
+			Fields: []builder.Field{
+				{
+					Name:  "gt",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+// deprecated: Use GtIfPresent instead.
+func (r postQuerySweetnessInt) GTIfPresent(value *int) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.GT(*value)
+}
+
+// deprecated: Use Gte instead.
+
+func (r postQuerySweetnessInt) GTE(value int) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Sweetness",
+			Fields: []builder.Field{
+				{
+					Name:  "gte",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+// deprecated: Use GteIfPresent instead.
+func (r postQuerySweetnessInt) GTEIfPresent(value *int) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.GTE(*value)
+}
+
+func (r postQuerySweetnessInt) Field() postPrismaFields {
+	return postFieldSweetness
+}
+
+// base struct
+type postQuerySournessInt struct{}
+
+// Set the required value of Sourness
+func (r postQuerySournessInt) Set(value int) postWithPrismaSournessSetParam {
+
+	return postWithPrismaSournessSetParam{
+		data: builder.Field{
+			Name:  "Sourness",
+			Value: value,
+		},
+	}
+
+}
+
+// Set the optional value of Sourness dynamically
+func (r postQuerySournessInt) SetIfPresent(value *Int) postWithPrismaSournessSetParam {
+	if value == nil {
+		return postWithPrismaSournessSetParam{}
+	}
+
+	return r.Set(*value)
+}
+
+// Increment the required value of Sourness
+func (r postQuerySournessInt) Increment(value int) postWithPrismaSournessSetParam {
+	return postWithPrismaSournessSetParam{
+		data: builder.Field{
+			Name: "Sourness",
+			Fields: []builder.Field{
+				builder.Field{
+					Name:  "increment",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQuerySournessInt) IncrementIfPresent(value *int) postWithPrismaSournessSetParam {
+	if value == nil {
+		return postWithPrismaSournessSetParam{}
+	}
+	return r.Increment(*value)
+}
+
+// Decrement the required value of Sourness
+func (r postQuerySournessInt) Decrement(value int) postWithPrismaSournessSetParam {
+	return postWithPrismaSournessSetParam{
+		data: builder.Field{
+			Name: "Sourness",
+			Fields: []builder.Field{
+				builder.Field{
+					Name:  "decrement",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQuerySournessInt) DecrementIfPresent(value *int) postWithPrismaSournessSetParam {
+	if value == nil {
+		return postWithPrismaSournessSetParam{}
+	}
+	return r.Decrement(*value)
+}
+
+// Multiply the required value of Sourness
+func (r postQuerySournessInt) Multiply(value int) postWithPrismaSournessSetParam {
+	return postWithPrismaSournessSetParam{
+		data: builder.Field{
+			Name: "Sourness",
+			Fields: []builder.Field{
+				builder.Field{
+					Name:  "multiply",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQuerySournessInt) MultiplyIfPresent(value *int) postWithPrismaSournessSetParam {
+	if value == nil {
+		return postWithPrismaSournessSetParam{}
+	}
+	return r.Multiply(*value)
+}
+
+// Divide the required value of Sourness
+func (r postQuerySournessInt) Divide(value int) postWithPrismaSournessSetParam {
+	return postWithPrismaSournessSetParam{
+		data: builder.Field{
+			Name: "Sourness",
+			Fields: []builder.Field{
+				builder.Field{
+					Name:  "divide",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQuerySournessInt) DivideIfPresent(value *int) postWithPrismaSournessSetParam {
+	if value == nil {
+		return postWithPrismaSournessSetParam{}
+	}
+	return r.Divide(*value)
+}
+
+func (r postQuerySournessInt) Equals(value int) postWithPrismaSournessEqualsParam {
+
+	return postWithPrismaSournessEqualsParam{
+		data: builder.Field{
+			Name: "Sourness",
+			Fields: []builder.Field{
+				{
+					Name:  "equals",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQuerySournessInt) EqualsIfPresent(value *int) postWithPrismaSournessEqualsParam {
+	if value == nil {
+		return postWithPrismaSournessEqualsParam{}
+	}
+	return r.Equals(*value)
+}
+
+func (r postQuerySournessInt) Order(direction SortOrder) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name:  "Sourness",
+			Value: direction,
+		},
+	}
+}
+
+func (r postQuerySournessInt) Cursor(cursor int) postCursorParam {
+	return postCursorParam{
+		data: builder.Field{
+			Name:  "Sourness",
+			Value: cursor,
+		},
+	}
+}
+
+func (r postQuerySournessInt) In(value []int) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Sourness",
+			Fields: []builder.Field{
+				{
+					Name:  "in",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQuerySournessInt) InIfPresent(value []int) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.In(value)
+}
+
+func (r postQuerySournessInt) NotIn(value []int) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Sourness",
+			Fields: []builder.Field{
+				{
+					Name:  "notIn",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQuerySournessInt) NotInIfPresent(value []int) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.NotIn(value)
+}
+
+func (r postQuerySournessInt) Lt(value int) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Sourness",
+			Fields: []builder.Field{
+				{
+					Name:  "lt",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQuerySournessInt) LtIfPresent(value *int) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.Lt(*value)
+}
+
+func (r postQuerySournessInt) Lte(value int) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Sourness",
+			Fields: []builder.Field{
+				{
+					Name:  "lte",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQuerySournessInt) LteIfPresent(value *int) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.Lte(*value)
+}
+
+func (r postQuerySournessInt) Gt(value int) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Sourness",
+			Fields: []builder.Field{
+				{
+					Name:  "gt",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQuerySournessInt) GtIfPresent(value *int) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.Gt(*value)
+}
+
+func (r postQuerySournessInt) Gte(value int) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Sourness",
+			Fields: []builder.Field{
+				{
+					Name:  "gte",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQuerySournessInt) GteIfPresent(value *int) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.Gte(*value)
+}
+
+func (r postQuerySournessInt) Not(value int) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Sourness",
+			Fields: []builder.Field{
+				{
+					Name:  "not",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+func (r postQuerySournessInt) NotIfPresent(value *int) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.Not(*value)
+}
+
+// deprecated: Use Lt instead.
+
+func (r postQuerySournessInt) LT(value int) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Sourness",
+			Fields: []builder.Field{
+				{
+					Name:  "lt",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+// deprecated: Use LtIfPresent instead.
+func (r postQuerySournessInt) LTIfPresent(value *int) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.LT(*value)
+}
+
+// deprecated: Use Lte instead.
+
+func (r postQuerySournessInt) LTE(value int) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Sourness",
+			Fields: []builder.Field{
+				{
+					Name:  "lte",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+// deprecated: Use LteIfPresent instead.
+func (r postQuerySournessInt) LTEIfPresent(value *int) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.LTE(*value)
+}
+
+// deprecated: Use Gt instead.
+
+func (r postQuerySournessInt) GT(value int) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Sourness",
+			Fields: []builder.Field{
+				{
+					Name:  "gt",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+// deprecated: Use GtIfPresent instead.
+func (r postQuerySournessInt) GTIfPresent(value *int) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.GT(*value)
+}
+
+// deprecated: Use Gte instead.
+
+func (r postQuerySournessInt) GTE(value int) postDefaultParam {
+	return postDefaultParam{
+		data: builder.Field{
+			Name: "Sourness",
+			Fields: []builder.Field{
+				{
+					Name:  "gte",
+					Value: value,
+				},
+			},
+		},
+	}
+}
+
+// deprecated: Use GteIfPresent instead.
+func (r postQuerySournessInt) GTEIfPresent(value *int) postDefaultParam {
+	if value == nil {
+		return postDefaultParam{}
+	}
+	return r.GTE(*value)
+}
+
+func (r postQuerySournessInt) Field() postPrismaFields {
+	return postFieldSourness
 }
 
 // base struct
@@ -19669,6 +24277,12 @@ var userOutput = []builder.Output{
 	{Name: "avatar"},
 	{Name: "firstName"},
 	{Name: "lastName"},
+	{Name: "Spiciness"},
+	{Name: "Sweetness"},
+	{Name: "Sourness"},
+	{Name: "Type"},
+	{Name: "Allergies"},
+	{Name: "City"},
 }
 
 type UserRelationWith interface {
@@ -20459,6 +25073,474 @@ func (p userWithPrismaLastNameEqualsUniqueParam) lastNameField() {}
 func (userWithPrismaLastNameEqualsUniqueParam) unique() {}
 func (userWithPrismaLastNameEqualsUniqueParam) equals() {}
 
+type UserWithPrismaSpicinessEqualsSetParam interface {
+	field() builder.Field
+	getQuery() builder.Query
+	equals()
+	userModel()
+	spicinessField()
+}
+
+type UserWithPrismaSpicinessSetParam interface {
+	field() builder.Field
+	getQuery() builder.Query
+	userModel()
+	spicinessField()
+}
+
+type userWithPrismaSpicinessSetParam struct {
+	data  builder.Field
+	query builder.Query
+}
+
+func (p userWithPrismaSpicinessSetParam) field() builder.Field {
+	return p.data
+}
+
+func (p userWithPrismaSpicinessSetParam) getQuery() builder.Query {
+	return p.query
+}
+
+func (p userWithPrismaSpicinessSetParam) userModel() {}
+
+func (p userWithPrismaSpicinessSetParam) spicinessField() {}
+
+type UserWithPrismaSpicinessWhereParam interface {
+	field() builder.Field
+	getQuery() builder.Query
+	userModel()
+	spicinessField()
+}
+
+type userWithPrismaSpicinessEqualsParam struct {
+	data  builder.Field
+	query builder.Query
+}
+
+func (p userWithPrismaSpicinessEqualsParam) field() builder.Field {
+	return p.data
+}
+
+func (p userWithPrismaSpicinessEqualsParam) getQuery() builder.Query {
+	return p.query
+}
+
+func (p userWithPrismaSpicinessEqualsParam) userModel() {}
+
+func (p userWithPrismaSpicinessEqualsParam) spicinessField() {}
+
+func (userWithPrismaSpicinessSetParam) settable()  {}
+func (userWithPrismaSpicinessEqualsParam) equals() {}
+
+type userWithPrismaSpicinessEqualsUniqueParam struct {
+	data  builder.Field
+	query builder.Query
+}
+
+func (p userWithPrismaSpicinessEqualsUniqueParam) field() builder.Field {
+	return p.data
+}
+
+func (p userWithPrismaSpicinessEqualsUniqueParam) getQuery() builder.Query {
+	return p.query
+}
+
+func (p userWithPrismaSpicinessEqualsUniqueParam) userModel()      {}
+func (p userWithPrismaSpicinessEqualsUniqueParam) spicinessField() {}
+
+func (userWithPrismaSpicinessEqualsUniqueParam) unique() {}
+func (userWithPrismaSpicinessEqualsUniqueParam) equals() {}
+
+type UserWithPrismaSweetnessEqualsSetParam interface {
+	field() builder.Field
+	getQuery() builder.Query
+	equals()
+	userModel()
+	sweetnessField()
+}
+
+type UserWithPrismaSweetnessSetParam interface {
+	field() builder.Field
+	getQuery() builder.Query
+	userModel()
+	sweetnessField()
+}
+
+type userWithPrismaSweetnessSetParam struct {
+	data  builder.Field
+	query builder.Query
+}
+
+func (p userWithPrismaSweetnessSetParam) field() builder.Field {
+	return p.data
+}
+
+func (p userWithPrismaSweetnessSetParam) getQuery() builder.Query {
+	return p.query
+}
+
+func (p userWithPrismaSweetnessSetParam) userModel() {}
+
+func (p userWithPrismaSweetnessSetParam) sweetnessField() {}
+
+type UserWithPrismaSweetnessWhereParam interface {
+	field() builder.Field
+	getQuery() builder.Query
+	userModel()
+	sweetnessField()
+}
+
+type userWithPrismaSweetnessEqualsParam struct {
+	data  builder.Field
+	query builder.Query
+}
+
+func (p userWithPrismaSweetnessEqualsParam) field() builder.Field {
+	return p.data
+}
+
+func (p userWithPrismaSweetnessEqualsParam) getQuery() builder.Query {
+	return p.query
+}
+
+func (p userWithPrismaSweetnessEqualsParam) userModel() {}
+
+func (p userWithPrismaSweetnessEqualsParam) sweetnessField() {}
+
+func (userWithPrismaSweetnessSetParam) settable()  {}
+func (userWithPrismaSweetnessEqualsParam) equals() {}
+
+type userWithPrismaSweetnessEqualsUniqueParam struct {
+	data  builder.Field
+	query builder.Query
+}
+
+func (p userWithPrismaSweetnessEqualsUniqueParam) field() builder.Field {
+	return p.data
+}
+
+func (p userWithPrismaSweetnessEqualsUniqueParam) getQuery() builder.Query {
+	return p.query
+}
+
+func (p userWithPrismaSweetnessEqualsUniqueParam) userModel()      {}
+func (p userWithPrismaSweetnessEqualsUniqueParam) sweetnessField() {}
+
+func (userWithPrismaSweetnessEqualsUniqueParam) unique() {}
+func (userWithPrismaSweetnessEqualsUniqueParam) equals() {}
+
+type UserWithPrismaSournessEqualsSetParam interface {
+	field() builder.Field
+	getQuery() builder.Query
+	equals()
+	userModel()
+	sournessField()
+}
+
+type UserWithPrismaSournessSetParam interface {
+	field() builder.Field
+	getQuery() builder.Query
+	userModel()
+	sournessField()
+}
+
+type userWithPrismaSournessSetParam struct {
+	data  builder.Field
+	query builder.Query
+}
+
+func (p userWithPrismaSournessSetParam) field() builder.Field {
+	return p.data
+}
+
+func (p userWithPrismaSournessSetParam) getQuery() builder.Query {
+	return p.query
+}
+
+func (p userWithPrismaSournessSetParam) userModel() {}
+
+func (p userWithPrismaSournessSetParam) sournessField() {}
+
+type UserWithPrismaSournessWhereParam interface {
+	field() builder.Field
+	getQuery() builder.Query
+	userModel()
+	sournessField()
+}
+
+type userWithPrismaSournessEqualsParam struct {
+	data  builder.Field
+	query builder.Query
+}
+
+func (p userWithPrismaSournessEqualsParam) field() builder.Field {
+	return p.data
+}
+
+func (p userWithPrismaSournessEqualsParam) getQuery() builder.Query {
+	return p.query
+}
+
+func (p userWithPrismaSournessEqualsParam) userModel() {}
+
+func (p userWithPrismaSournessEqualsParam) sournessField() {}
+
+func (userWithPrismaSournessSetParam) settable()  {}
+func (userWithPrismaSournessEqualsParam) equals() {}
+
+type userWithPrismaSournessEqualsUniqueParam struct {
+	data  builder.Field
+	query builder.Query
+}
+
+func (p userWithPrismaSournessEqualsUniqueParam) field() builder.Field {
+	return p.data
+}
+
+func (p userWithPrismaSournessEqualsUniqueParam) getQuery() builder.Query {
+	return p.query
+}
+
+func (p userWithPrismaSournessEqualsUniqueParam) userModel()     {}
+func (p userWithPrismaSournessEqualsUniqueParam) sournessField() {}
+
+func (userWithPrismaSournessEqualsUniqueParam) unique() {}
+func (userWithPrismaSournessEqualsUniqueParam) equals() {}
+
+type UserWithPrismaTypeEqualsSetParam interface {
+	field() builder.Field
+	getQuery() builder.Query
+	equals()
+	userModel()
+	typeField()
+}
+
+type UserWithPrismaTypeSetParam interface {
+	field() builder.Field
+	getQuery() builder.Query
+	userModel()
+	typeField()
+}
+
+type userWithPrismaTypeSetParam struct {
+	data  builder.Field
+	query builder.Query
+}
+
+func (p userWithPrismaTypeSetParam) field() builder.Field {
+	return p.data
+}
+
+func (p userWithPrismaTypeSetParam) getQuery() builder.Query {
+	return p.query
+}
+
+func (p userWithPrismaTypeSetParam) userModel() {}
+
+func (p userWithPrismaTypeSetParam) typeField() {}
+
+type UserWithPrismaTypeWhereParam interface {
+	field() builder.Field
+	getQuery() builder.Query
+	userModel()
+	typeField()
+}
+
+type userWithPrismaTypeEqualsParam struct {
+	data  builder.Field
+	query builder.Query
+}
+
+func (p userWithPrismaTypeEqualsParam) field() builder.Field {
+	return p.data
+}
+
+func (p userWithPrismaTypeEqualsParam) getQuery() builder.Query {
+	return p.query
+}
+
+func (p userWithPrismaTypeEqualsParam) userModel() {}
+
+func (p userWithPrismaTypeEqualsParam) typeField() {}
+
+func (userWithPrismaTypeSetParam) settable()  {}
+func (userWithPrismaTypeEqualsParam) equals() {}
+
+type userWithPrismaTypeEqualsUniqueParam struct {
+	data  builder.Field
+	query builder.Query
+}
+
+func (p userWithPrismaTypeEqualsUniqueParam) field() builder.Field {
+	return p.data
+}
+
+func (p userWithPrismaTypeEqualsUniqueParam) getQuery() builder.Query {
+	return p.query
+}
+
+func (p userWithPrismaTypeEqualsUniqueParam) userModel() {}
+func (p userWithPrismaTypeEqualsUniqueParam) typeField() {}
+
+func (userWithPrismaTypeEqualsUniqueParam) unique() {}
+func (userWithPrismaTypeEqualsUniqueParam) equals() {}
+
+type UserWithPrismaAllergiesEqualsSetParam interface {
+	field() builder.Field
+	getQuery() builder.Query
+	equals()
+	userModel()
+	allergiesField()
+}
+
+type UserWithPrismaAllergiesSetParam interface {
+	field() builder.Field
+	getQuery() builder.Query
+	userModel()
+	allergiesField()
+}
+
+type userWithPrismaAllergiesSetParam struct {
+	data  builder.Field
+	query builder.Query
+}
+
+func (p userWithPrismaAllergiesSetParam) field() builder.Field {
+	return p.data
+}
+
+func (p userWithPrismaAllergiesSetParam) getQuery() builder.Query {
+	return p.query
+}
+
+func (p userWithPrismaAllergiesSetParam) userModel() {}
+
+func (p userWithPrismaAllergiesSetParam) allergiesField() {}
+
+type UserWithPrismaAllergiesWhereParam interface {
+	field() builder.Field
+	getQuery() builder.Query
+	userModel()
+	allergiesField()
+}
+
+type userWithPrismaAllergiesEqualsParam struct {
+	data  builder.Field
+	query builder.Query
+}
+
+func (p userWithPrismaAllergiesEqualsParam) field() builder.Field {
+	return p.data
+}
+
+func (p userWithPrismaAllergiesEqualsParam) getQuery() builder.Query {
+	return p.query
+}
+
+func (p userWithPrismaAllergiesEqualsParam) userModel() {}
+
+func (p userWithPrismaAllergiesEqualsParam) allergiesField() {}
+
+func (userWithPrismaAllergiesSetParam) settable()  {}
+func (userWithPrismaAllergiesEqualsParam) equals() {}
+
+type userWithPrismaAllergiesEqualsUniqueParam struct {
+	data  builder.Field
+	query builder.Query
+}
+
+func (p userWithPrismaAllergiesEqualsUniqueParam) field() builder.Field {
+	return p.data
+}
+
+func (p userWithPrismaAllergiesEqualsUniqueParam) getQuery() builder.Query {
+	return p.query
+}
+
+func (p userWithPrismaAllergiesEqualsUniqueParam) userModel()      {}
+func (p userWithPrismaAllergiesEqualsUniqueParam) allergiesField() {}
+
+func (userWithPrismaAllergiesEqualsUniqueParam) unique() {}
+func (userWithPrismaAllergiesEqualsUniqueParam) equals() {}
+
+type UserWithPrismaCityEqualsSetParam interface {
+	field() builder.Field
+	getQuery() builder.Query
+	equals()
+	userModel()
+	cityField()
+}
+
+type UserWithPrismaCitySetParam interface {
+	field() builder.Field
+	getQuery() builder.Query
+	userModel()
+	cityField()
+}
+
+type userWithPrismaCitySetParam struct {
+	data  builder.Field
+	query builder.Query
+}
+
+func (p userWithPrismaCitySetParam) field() builder.Field {
+	return p.data
+}
+
+func (p userWithPrismaCitySetParam) getQuery() builder.Query {
+	return p.query
+}
+
+func (p userWithPrismaCitySetParam) userModel() {}
+
+func (p userWithPrismaCitySetParam) cityField() {}
+
+type UserWithPrismaCityWhereParam interface {
+	field() builder.Field
+	getQuery() builder.Query
+	userModel()
+	cityField()
+}
+
+type userWithPrismaCityEqualsParam struct {
+	data  builder.Field
+	query builder.Query
+}
+
+func (p userWithPrismaCityEqualsParam) field() builder.Field {
+	return p.data
+}
+
+func (p userWithPrismaCityEqualsParam) getQuery() builder.Query {
+	return p.query
+}
+
+func (p userWithPrismaCityEqualsParam) userModel() {}
+
+func (p userWithPrismaCityEqualsParam) cityField() {}
+
+func (userWithPrismaCitySetParam) settable()  {}
+func (userWithPrismaCityEqualsParam) equals() {}
+
+type userWithPrismaCityEqualsUniqueParam struct {
+	data  builder.Field
+	query builder.Query
+}
+
+func (p userWithPrismaCityEqualsUniqueParam) field() builder.Field {
+	return p.data
+}
+
+func (p userWithPrismaCityEqualsUniqueParam) getQuery() builder.Query {
+	return p.query
+}
+
+func (p userWithPrismaCityEqualsUniqueParam) userModel() {}
+func (p userWithPrismaCityEqualsUniqueParam) cityField() {}
+
+func (userWithPrismaCityEqualsUniqueParam) unique() {}
+func (userWithPrismaCityEqualsUniqueParam) equals() {}
+
 type UserWithPrismaPostsEqualsSetParam interface {
 	field() builder.Field
 	getQuery() builder.Query
@@ -20940,6 +26022,12 @@ var postOutput = []builder.Output{
 	{Name: "description"},
 	{Name: "longitude"},
 	{Name: "latitude"},
+	{Name: "Cuisine"},
+	{Name: "Dish"},
+	{Name: "Type"},
+	{Name: "Spiciness"},
+	{Name: "Sweetness"},
+	{Name: "Sourness"},
 	{Name: "pictures"},
 	{Name: "userId"},
 	{Name: "city"},
@@ -21103,7 +26191,7 @@ type postSetParam struct {
 	data builder.Field
 }
 
-func (p postSetParam) cityField() {
+func (p postSetParam) titleField() {
 	//TODO implement me
 	panic("implement me")
 }
@@ -21113,7 +26201,7 @@ func (p postSetParam) getQuery() builder.Query {
 	panic("implement me")
 }
 
-func (p postSetParam) titleField() {
+func (p postSetParam) cityField() {
 	//TODO implement me
 	panic("implement me")
 }
@@ -21629,7 +26717,7 @@ type postWithPrismaLatitudeSetParam struct {
 	query builder.Query
 }
 
-func (p postWithPrismaLatitudeSetParam) picturesField() {
+func (p postWithPrismaLatitudeSetParam) cuisineField() {
 	//TODO implement me
 	panic("implement me")
 }
@@ -21692,6 +26780,504 @@ func (p postWithPrismaLatitudeEqualsUniqueParam) latitudeField() {}
 func (postWithPrismaLatitudeEqualsUniqueParam) unique() {}
 func (postWithPrismaLatitudeEqualsUniqueParam) equals() {}
 
+type PostWithPrismaCuisineEqualsSetParam interface {
+	field() builder.Field
+	getQuery() builder.Query
+	equals()
+	postModel()
+	cuisineField()
+}
+
+type PostWithPrismaCuisineSetParam interface {
+	field() builder.Field
+	getQuery() builder.Query
+	postModel()
+	cuisineField()
+}
+
+type postWithPrismaCuisineSetParam struct {
+	data  builder.Field
+	query builder.Query
+}
+
+func (p postWithPrismaCuisineSetParam) sweetnessField() {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (p postWithPrismaCuisineSetParam) field() builder.Field {
+	return p.data
+}
+
+func (p postWithPrismaCuisineSetParam) getQuery() builder.Query {
+	return p.query
+}
+
+func (p postWithPrismaCuisineSetParam) postModel() {}
+
+func (p postWithPrismaCuisineSetParam) cuisineField() {}
+
+type PostWithPrismaCuisineWhereParam interface {
+	field() builder.Field
+	getQuery() builder.Query
+	postModel()
+	cuisineField()
+}
+
+type postWithPrismaCuisineEqualsParam struct {
+	data  builder.Field
+	query builder.Query
+}
+
+func (p postWithPrismaCuisineEqualsParam) field() builder.Field {
+	return p.data
+}
+
+func (p postWithPrismaCuisineEqualsParam) getQuery() builder.Query {
+	return p.query
+}
+
+func (p postWithPrismaCuisineEqualsParam) postModel() {}
+
+func (p postWithPrismaCuisineEqualsParam) cuisineField() {}
+
+func (postWithPrismaCuisineSetParam) settable()  {}
+func (postWithPrismaCuisineEqualsParam) equals() {}
+
+type postWithPrismaCuisineEqualsUniqueParam struct {
+	data  builder.Field
+	query builder.Query
+}
+
+func (p postWithPrismaCuisineEqualsUniqueParam) field() builder.Field {
+	return p.data
+}
+
+func (p postWithPrismaCuisineEqualsUniqueParam) getQuery() builder.Query {
+	return p.query
+}
+
+func (p postWithPrismaCuisineEqualsUniqueParam) postModel()    {}
+func (p postWithPrismaCuisineEqualsUniqueParam) cuisineField() {}
+
+func (postWithPrismaCuisineEqualsUniqueParam) unique() {}
+func (postWithPrismaCuisineEqualsUniqueParam) equals() {}
+
+type PostWithPrismaDishEqualsSetParam interface {
+	field() builder.Field
+	getQuery() builder.Query
+	equals()
+	postModel()
+	dishField()
+}
+
+type PostWithPrismaDishSetParam interface {
+	field() builder.Field
+	getQuery() builder.Query
+	postModel()
+	dishField()
+}
+
+type postWithPrismaDishSetParam struct {
+	data  builder.Field
+	query builder.Query
+}
+
+func (p postWithPrismaDishSetParam) sournessField() {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (p postWithPrismaDishSetParam) field() builder.Field {
+	return p.data
+}
+
+func (p postWithPrismaDishSetParam) getQuery() builder.Query {
+	return p.query
+}
+
+func (p postWithPrismaDishSetParam) postModel() {}
+
+func (p postWithPrismaDishSetParam) dishField() {}
+
+type PostWithPrismaDishWhereParam interface {
+	field() builder.Field
+	getQuery() builder.Query
+	postModel()
+	dishField()
+}
+
+type postWithPrismaDishEqualsParam struct {
+	data  builder.Field
+	query builder.Query
+}
+
+func (p postWithPrismaDishEqualsParam) field() builder.Field {
+	return p.data
+}
+
+func (p postWithPrismaDishEqualsParam) getQuery() builder.Query {
+	return p.query
+}
+
+func (p postWithPrismaDishEqualsParam) postModel() {}
+
+func (p postWithPrismaDishEqualsParam) dishField() {}
+
+func (postWithPrismaDishSetParam) settable()  {}
+func (postWithPrismaDishEqualsParam) equals() {}
+
+type postWithPrismaDishEqualsUniqueParam struct {
+	data  builder.Field
+	query builder.Query
+}
+
+func (p postWithPrismaDishEqualsUniqueParam) field() builder.Field {
+	return p.data
+}
+
+func (p postWithPrismaDishEqualsUniqueParam) getQuery() builder.Query {
+	return p.query
+}
+
+func (p postWithPrismaDishEqualsUniqueParam) postModel() {}
+func (p postWithPrismaDishEqualsUniqueParam) dishField() {}
+
+func (postWithPrismaDishEqualsUniqueParam) unique() {}
+func (postWithPrismaDishEqualsUniqueParam) equals() {}
+
+type PostWithPrismaTypeEqualsSetParam interface {
+	field() builder.Field
+	getQuery() builder.Query
+	equals()
+	postModel()
+	typeField()
+}
+
+type PostWithPrismaTypeSetParam interface {
+	field() builder.Field
+	getQuery() builder.Query
+	postModel()
+	typeField()
+}
+
+type postWithPrismaTypeSetParam struct {
+	data  builder.Field
+	query builder.Query
+}
+
+func (p postWithPrismaTypeSetParam) spicinessField() {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (p postWithPrismaTypeSetParam) field() builder.Field {
+	return p.data
+}
+
+func (p postWithPrismaTypeSetParam) getQuery() builder.Query {
+	return p.query
+}
+
+func (p postWithPrismaTypeSetParam) postModel() {}
+
+func (p postWithPrismaTypeSetParam) typeField() {}
+
+type PostWithPrismaTypeWhereParam interface {
+	field() builder.Field
+	getQuery() builder.Query
+	postModel()
+	typeField()
+}
+
+type postWithPrismaTypeEqualsParam struct {
+	data  builder.Field
+	query builder.Query
+}
+
+func (p postWithPrismaTypeEqualsParam) field() builder.Field {
+	return p.data
+}
+
+func (p postWithPrismaTypeEqualsParam) getQuery() builder.Query {
+	return p.query
+}
+
+func (p postWithPrismaTypeEqualsParam) postModel() {}
+
+func (p postWithPrismaTypeEqualsParam) typeField() {}
+
+func (postWithPrismaTypeSetParam) settable()  {}
+func (postWithPrismaTypeEqualsParam) equals() {}
+
+type postWithPrismaTypeEqualsUniqueParam struct {
+	data  builder.Field
+	query builder.Query
+}
+
+func (p postWithPrismaTypeEqualsUniqueParam) field() builder.Field {
+	return p.data
+}
+
+func (p postWithPrismaTypeEqualsUniqueParam) getQuery() builder.Query {
+	return p.query
+}
+
+func (p postWithPrismaTypeEqualsUniqueParam) postModel() {}
+func (p postWithPrismaTypeEqualsUniqueParam) typeField() {}
+
+func (postWithPrismaTypeEqualsUniqueParam) unique() {}
+func (postWithPrismaTypeEqualsUniqueParam) equals() {}
+
+type PostWithPrismaSpicinessEqualsSetParam interface {
+	field() builder.Field
+	getQuery() builder.Query
+	equals()
+	postModel()
+	spicinessField()
+}
+
+type PostWithPrismaSpicinessSetParam interface {
+	field() builder.Field
+	getQuery() builder.Query
+	postModel()
+	spicinessField()
+}
+
+type postWithPrismaSpicinessSetParam struct {
+	data  builder.Field
+	query builder.Query
+}
+
+func (p postWithPrismaSpicinessSetParam) picturesField() {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (p postWithPrismaSpicinessSetParam) field() builder.Field {
+	return p.data
+}
+
+func (p postWithPrismaSpicinessSetParam) getQuery() builder.Query {
+	return p.query
+}
+
+func (p postWithPrismaSpicinessSetParam) postModel() {}
+
+func (p postWithPrismaSpicinessSetParam) spicinessField() {}
+
+type PostWithPrismaSpicinessWhereParam interface {
+	field() builder.Field
+	getQuery() builder.Query
+	postModel()
+	spicinessField()
+}
+
+type postWithPrismaSpicinessEqualsParam struct {
+	data  builder.Field
+	query builder.Query
+}
+
+func (p postWithPrismaSpicinessEqualsParam) field() builder.Field {
+	return p.data
+}
+
+func (p postWithPrismaSpicinessEqualsParam) getQuery() builder.Query {
+	return p.query
+}
+
+func (p postWithPrismaSpicinessEqualsParam) postModel() {}
+
+func (p postWithPrismaSpicinessEqualsParam) spicinessField() {}
+
+func (postWithPrismaSpicinessSetParam) settable()  {}
+func (postWithPrismaSpicinessEqualsParam) equals() {}
+
+type postWithPrismaSpicinessEqualsUniqueParam struct {
+	data  builder.Field
+	query builder.Query
+}
+
+func (p postWithPrismaSpicinessEqualsUniqueParam) field() builder.Field {
+	return p.data
+}
+
+func (p postWithPrismaSpicinessEqualsUniqueParam) getQuery() builder.Query {
+	return p.query
+}
+
+func (p postWithPrismaSpicinessEqualsUniqueParam) postModel()      {}
+func (p postWithPrismaSpicinessEqualsUniqueParam) spicinessField() {}
+
+func (postWithPrismaSpicinessEqualsUniqueParam) unique() {}
+func (postWithPrismaSpicinessEqualsUniqueParam) equals() {}
+
+type PostWithPrismaSweetnessEqualsSetParam interface {
+	field() builder.Field
+	getQuery() builder.Query
+	equals()
+	postModel()
+	sweetnessField()
+}
+
+type PostWithPrismaSweetnessSetParam interface {
+	field() builder.Field
+	getQuery() builder.Query
+	postModel()
+	sweetnessField()
+}
+
+type postWithPrismaSweetnessSetParam struct {
+	data  builder.Field
+	query builder.Query
+}
+
+func (p postWithPrismaSweetnessSetParam) cityField() {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (p postWithPrismaSweetnessSetParam) field() builder.Field {
+	return p.data
+}
+
+func (p postWithPrismaSweetnessSetParam) getQuery() builder.Query {
+	return p.query
+}
+
+func (p postWithPrismaSweetnessSetParam) postModel() {}
+
+func (p postWithPrismaSweetnessSetParam) sweetnessField() {}
+
+type PostWithPrismaSweetnessWhereParam interface {
+	field() builder.Field
+	getQuery() builder.Query
+	postModel()
+	sweetnessField()
+}
+
+type postWithPrismaSweetnessEqualsParam struct {
+	data  builder.Field
+	query builder.Query
+}
+
+func (p postWithPrismaSweetnessEqualsParam) field() builder.Field {
+	return p.data
+}
+
+func (p postWithPrismaSweetnessEqualsParam) getQuery() builder.Query {
+	return p.query
+}
+
+func (p postWithPrismaSweetnessEqualsParam) postModel() {}
+
+func (p postWithPrismaSweetnessEqualsParam) sweetnessField() {}
+
+func (postWithPrismaSweetnessSetParam) settable()  {}
+func (postWithPrismaSweetnessEqualsParam) equals() {}
+
+type postWithPrismaSweetnessEqualsUniqueParam struct {
+	data  builder.Field
+	query builder.Query
+}
+
+func (p postWithPrismaSweetnessEqualsUniqueParam) field() builder.Field {
+	return p.data
+}
+
+func (p postWithPrismaSweetnessEqualsUniqueParam) getQuery() builder.Query {
+	return p.query
+}
+
+func (p postWithPrismaSweetnessEqualsUniqueParam) postModel()      {}
+func (p postWithPrismaSweetnessEqualsUniqueParam) sweetnessField() {}
+
+func (postWithPrismaSweetnessEqualsUniqueParam) unique() {}
+func (postWithPrismaSweetnessEqualsUniqueParam) equals() {}
+
+type PostWithPrismaSournessEqualsSetParam interface {
+	field() builder.Field
+	getQuery() builder.Query
+	equals()
+	postModel()
+	sournessField()
+}
+
+type PostWithPrismaSournessSetParam interface {
+	field() builder.Field
+	getQuery() builder.Query
+	postModel()
+	sournessField()
+}
+
+type postWithPrismaSournessSetParam struct {
+	data  builder.Field
+	query builder.Query
+}
+
+func (p postWithPrismaSournessSetParam) userField() {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (p postWithPrismaSournessSetParam) field() builder.Field {
+	return p.data
+}
+
+func (p postWithPrismaSournessSetParam) getQuery() builder.Query {
+	return p.query
+}
+
+func (p postWithPrismaSournessSetParam) postModel() {}
+
+func (p postWithPrismaSournessSetParam) sournessField() {}
+
+type PostWithPrismaSournessWhereParam interface {
+	field() builder.Field
+	getQuery() builder.Query
+	postModel()
+	sournessField()
+}
+
+type postWithPrismaSournessEqualsParam struct {
+	data  builder.Field
+	query builder.Query
+}
+
+func (p postWithPrismaSournessEqualsParam) field() builder.Field {
+	return p.data
+}
+
+func (p postWithPrismaSournessEqualsParam) getQuery() builder.Query {
+	return p.query
+}
+
+func (p postWithPrismaSournessEqualsParam) postModel() {}
+
+func (p postWithPrismaSournessEqualsParam) sournessField() {}
+
+func (postWithPrismaSournessSetParam) settable()  {}
+func (postWithPrismaSournessEqualsParam) equals() {}
+
+type postWithPrismaSournessEqualsUniqueParam struct {
+	data  builder.Field
+	query builder.Query
+}
+
+func (p postWithPrismaSournessEqualsUniqueParam) field() builder.Field {
+	return p.data
+}
+
+func (p postWithPrismaSournessEqualsUniqueParam) getQuery() builder.Query {
+	return p.query
+}
+
+func (p postWithPrismaSournessEqualsUniqueParam) postModel()     {}
+func (p postWithPrismaSournessEqualsUniqueParam) sournessField() {}
+
+func (postWithPrismaSournessEqualsUniqueParam) unique() {}
+func (postWithPrismaSournessEqualsUniqueParam) equals() {}
+
 type PostWithPrismaPicturesEqualsSetParam interface {
 	field() builder.Field
 	getQuery() builder.Query
@@ -21712,7 +27298,7 @@ type postWithPrismaPicturesSetParam struct {
 	query builder.Query
 }
 
-func (p postWithPrismaPicturesSetParam) cityField() {
+func (p postWithPrismaPicturesSetParam) dishField() {
 	//TODO implement me
 	panic("implement me")
 }
@@ -21819,11 +27405,6 @@ type postWithPrismaUserIDEqualsParam struct {
 	query builder.Query
 }
 
-func (p postWithPrismaUserIDEqualsParam) unique() {
-	//TODO implement me
-	panic("implement me")
-}
-
 func (p postWithPrismaUserIDEqualsParam) field() builder.Field {
 	return p.data
 }
@@ -21876,6 +27457,11 @@ type PostWithPrismaCitySetParam interface {
 type postWithPrismaCitySetParam struct {
 	data  builder.Field
 	query builder.Query
+}
+
+func (p postWithPrismaCitySetParam) typeField() {
+	//TODO implement me
+	panic("implement me")
 }
 
 func (p postWithPrismaCitySetParam) userField() {
@@ -26078,6 +31664,12 @@ func (r userActions) CreateOne(
 	_avatar UserWithPrismaAvatarSetParam,
 	_firstName UserWithPrismaFirstNameSetParam,
 	_lastName UserWithPrismaLastNameSetParam,
+	_spiciness UserWithPrismaSpicinessSetParam,
+	_sweetness UserWithPrismaSweetnessSetParam,
+	_sourness UserWithPrismaSournessSetParam,
+	_type UserWithPrismaTypeSetParam,
+	_allergies UserWithPrismaAllergiesSetParam,
+	_city UserWithPrismaCitySetParam,
 
 	optional ...UserSetParam,
 ) userCreateOne {
@@ -26099,6 +31691,12 @@ func (r userActions) CreateOne(
 	fields = append(fields, _avatar.field())
 	fields = append(fields, _firstName.field())
 	fields = append(fields, _lastName.field())
+	fields = append(fields, _spiciness.field())
+	fields = append(fields, _sweetness.field())
+	fields = append(fields, _sourness.field())
+	fields = append(fields, _type.field())
+	fields = append(fields, _allergies.field())
+	fields = append(fields, _city.field())
 
 	for _, q := range optional {
 		fields = append(fields, q.field())
@@ -26155,6 +31753,12 @@ func (r postActions) CreateOne(
 	_description PostWithPrismaDescriptionSetParam,
 	_longitude PostWithPrismaLongitudeSetParam,
 	_latitude PostWithPrismaLatitudeSetParam,
+	_cuisine PostWithPrismaCuisineSetParam,
+	_dish PostWithPrismaDishSetParam,
+	_type PostWithPrismaTypeSetParam,
+	_spiciness PostWithPrismaSpicinessSetParam,
+	_sweetness PostWithPrismaSweetnessSetParam,
+	_sourness PostWithPrismaSournessSetParam,
 	_pictures PostWithPrismaPicturesSetParam,
 	_city PostWithPrismaCitySetParam,
 	_user PostWithPrismaUserSetParam,
@@ -26176,6 +31780,12 @@ func (r postActions) CreateOne(
 	fields = append(fields, _description.field())
 	fields = append(fields, _longitude.field())
 	fields = append(fields, _latitude.field())
+	fields = append(fields, _cuisine.field())
+	fields = append(fields, _dish.field())
+	fields = append(fields, _type.field())
+	fields = append(fields, _spiciness.field())
+	fields = append(fields, _sweetness.field())
+	fields = append(fields, _sourness.field())
 	fields = append(fields, _pictures.field())
 	fields = append(fields, _city.field())
 	fields = append(fields, _user.field())
@@ -43712,6 +49322,12 @@ func (r userUpsertOne) Create(
 	_avatar UserWithPrismaAvatarSetParam,
 	_firstName UserWithPrismaFirstNameSetParam,
 	_lastName UserWithPrismaLastNameSetParam,
+	_spiciness UserWithPrismaSpicinessSetParam,
+	_sweetness UserWithPrismaSweetnessSetParam,
+	_sourness UserWithPrismaSournessSetParam,
+	_type UserWithPrismaTypeSetParam,
+	_allergies UserWithPrismaAllergiesSetParam,
+	_city UserWithPrismaCitySetParam,
 
 	optional ...UserSetParam,
 ) userUpsertOne {
@@ -43726,6 +49342,12 @@ func (r userUpsertOne) Create(
 	fields = append(fields, _avatar.field())
 	fields = append(fields, _firstName.field())
 	fields = append(fields, _lastName.field())
+	fields = append(fields, _spiciness.field())
+	fields = append(fields, _sweetness.field())
+	fields = append(fields, _sourness.field())
+	fields = append(fields, _type.field())
+	fields = append(fields, _allergies.field())
+	fields = append(fields, _city.field())
 
 	for _, q := range optional {
 		fields = append(fields, q.field())
@@ -43825,16 +49447,18 @@ func (r postActions) UpsertOne(
 	return v
 }
 
-func (r postActions) UpdateOne(equals postWithPrismaIDEqualsUniqueParam) {
-	
-}
-
 func (r postUpsertOne) Create(
 
 	_title PostWithPrismaTitleSetParam,
 	_description PostWithPrismaDescriptionSetParam,
 	_longitude PostWithPrismaLongitudeSetParam,
 	_latitude PostWithPrismaLatitudeSetParam,
+	_cuisine PostWithPrismaCuisineSetParam,
+	_dish PostWithPrismaDishSetParam,
+	_type PostWithPrismaTypeSetParam,
+	_spiciness PostWithPrismaSpicinessSetParam,
+	_sweetness PostWithPrismaSweetnessSetParam,
+	_sourness PostWithPrismaSournessSetParam,
 	_pictures PostWithPrismaPicturesSetParam,
 	_city PostWithPrismaCitySetParam,
 	_user PostWithPrismaUserSetParam,
@@ -43849,6 +49473,12 @@ func (r postUpsertOne) Create(
 	fields = append(fields, _description.field())
 	fields = append(fields, _longitude.field())
 	fields = append(fields, _latitude.field())
+	fields = append(fields, _cuisine.field())
+	fields = append(fields, _dish.field())
+	fields = append(fields, _type.field())
+	fields = append(fields, _spiciness.field())
+	fields = append(fields, _sweetness.field())
+	fields = append(fields, _sourness.field())
 	fields = append(fields, _pictures.field())
 	fields = append(fields, _city.field())
 	fields = append(fields, _user.field())

@@ -16,6 +16,12 @@ model User {
   avatar    String
   firstName String
   lastName  String
+  Spiciness Int
+  Sweetness Int
+  Sourness  Int
+  Type      String
+  Allergies String
+  City      String
   posts     Post[]
   likes     Like[]
   comments  Comment[]
@@ -32,6 +38,12 @@ model Post {
   description    String
   longitude      String
   latitude       String
+  Cuisine        String
+  Dish           String
+  Type           String
+  Spiciness      Int
+  Sweetness      Int
+  Sourness       Int
   pictures       String
   userId         String
   city           String

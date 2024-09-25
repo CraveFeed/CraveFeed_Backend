@@ -28,17 +28,15 @@ func GetAllPosts(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func CreateUser(w http.ResponseWriter, r *http.Request) { //Removed optional field in Avatar/Bio for testing
+func CreateUser(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	pClient := database.PClient
 	var userData interfaces.CreateUserRequest
 	err := json.NewDecoder(r.Body).Decode(&userData)
-
 	if err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
-
 	createdUser, err := pClient.Client.User.CreateOne(
 		db.User.Email.Set(userData.Email),
 		db.User.Username.Set(userData.Username),
@@ -47,13 +45,17 @@ func CreateUser(w http.ResponseWriter, r *http.Request) { //Removed optional fie
 		db.User.Avatar.Set(userData.Avatar),
 		db.User.FirstName.Set(userData.FirstName),
 		db.User.LastName.Set(userData.LastName),
+		db.User.Spiciness.Set(userData.Spiciness),
+		db.User.Sweetness.Set(userData.Sweetness),
+		db.User.Sourness.Set(userData.Sourness),
+		db.User.Type.Set(userData.Type),
+		db.User.Allergies.Set(userData.Allergies),
+		db.User.City.Set(userData.City),
 	).Exec(pClient.Context)
-
 	if err != nil {
 		http.Error(w, "Failed to create user", http.StatusInternalServerError)
 		return
 	}
-
 	w.Header().Set("Content-Type", "application/json")
 	helpers.WriteJSON(w, http.StatusOK, createdUser)
 }
@@ -63,27 +65,29 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 	pClient := database.PClient
 	var postData interfaces.CreatePostRequest
 	err := json.NewDecoder(r.Body).Decode(&postData)
-
 	if err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
-
 	createdPost, err := pClient.Client.Post.CreateOne(
 		db.Post.Title.Set(postData.Title),
 		db.Post.Description.Set(postData.Description),
 		db.Post.Longitude.Set(postData.Longitude),
 		db.Post.Latitude.Set(postData.Latitude),
+		db.Post.Cuisine.Set(postData.Cuisine),
+		db.Post.Dish.Set(postData.Dish),
+		db.Post.Type.Set(postData.Type),
+		db.Post.Spiciness.Set(postData.Spiciness),
+		db.Post.Sweetness.Set(postData.Sweetness),
+		db.Post.Sourness.Set(postData.Sourness),
 		db.Post.Pictures.Set(postData.Pictures),
 		db.Post.UserID.Set(postData.UserID),
 		db.Post.City.Set(postData.City),
 	).Exec(pClient.Context)
-
 	if err != nil {
-		http.Error(w, "Failed to create user", http.StatusInternalServerError)
+		http.Error(w, "Failed to create post", http.StatusInternalServerError)
 		return
 	}
-
 	w.Header().Set("Content-Type", "application/json")
 	helpers.WriteJSON(w, http.StatusOK, createdPost)
 }
@@ -174,7 +178,6 @@ func GetProfileBio(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, "User not found", http.StatusNotFound)
 		return
-
 	}
 	response := map[string]interface{}{
 		"username":      profile.Username,
@@ -223,6 +226,11 @@ func GetProfileInfo(w http.ResponseWriter, r *http.Request) {
 		"userPosts":     profile.Posts(),
 		"followers":     profile.Followers(),
 		"following":     profile.Following(),
+		"spiciness":     profile.Spiciness,
+		"sweetness":     profile.Sweetness,
+		"sourness":      profile.Sourness,
+		"type":          profile.Type,
+		"allergies":     profile.Allergies,
 	}
 	w.Header().Set("Content-Type", "application/json")
 	helpers.WriteJSON(w, http.StatusOK, response)
@@ -262,6 +270,12 @@ func Repost(w http.ResponseWriter, r *http.Request) {
 		db.Post.Latitude.Set(originalPost.Latitude),
 		db.Post.Pictures.Set(originalPost.Pictures),
 		db.Post.City.Set(originalPost.City),
+		db.Post.Type.Set(originalPost.Type),
+		db.Post.Cuisine.Set(originalPost.Cuisine),
+		db.Post.Dish.Set(originalPost.Dish),
+		db.Post.Spiciness.Set(originalPost.Spiciness),
+		db.Post.Sweetness.Set(originalPost.Sweetness),
+		db.Post.Sourness.Set(originalPost.Sourness),
 		db.Post.OriginalPostID.Set(originalPostID),
 	).Exec(pClient.Context)
 	if err != nil {
@@ -342,6 +356,12 @@ func EditPosts(w http.ResponseWriter, r *http.Request) {
 		db.Post.Latitude.Set(postData.Latitude),
 		db.Post.Pictures.Set(postData.Pictures),
 		db.Post.City.Set(postData.City),
+		db.Post.Cuisine.Set(postData.Cuisine),
+		db.Post.Dish.Set(postData.Dish),
+		db.Post.Type.Set(postData.Type),
+		db.Post.Spiciness.Set(postData.Spiciness),
+		db.Post.Sweetness.Set(postData.Sweetness),
+		db.Post.Sourness.Set(postData.Sourness),
 	).Exec(pClient.Context)
 	if err != nil {
 		log.Printf("Error updating post: %v", err)
