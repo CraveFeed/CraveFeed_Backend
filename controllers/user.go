@@ -315,31 +315,39 @@ func GetUsernameUserId(w http.ResponseWriter, r *http.Request) {
 func EditPosts(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	pClient := database.PClient
-	var profileData interfaces.EditPostRequest
-	err := json.NewDecoder(r.Body).Decode(&profileData)
+	var postData interfaces.EditPostRequest
+	err := json.NewDecoder(r.Body).Decode(&postData)
 	if err != nil {
 		http.Error(w, "Invalid input data", http.StatusBadRequest)
 		return
 	}
-	if profileData.PostID == "" {
+	if postData.PostID == "" {
 		http.Error(w, "Post ID is required", http.StatusBadRequest)
 		return
 	}
-	posts, err := pClient.Client.Post.UpsertOne(
-		db.Post.ID.Equals(profileData.PostID), // Ensure this matches your ORM's method
+	_, err = pClient.Client.Post.FindUnique(
+		db.Post.ID.Equals(postData.PostID),
+	).Exec(pClient.Context)
+	if err != nil {
+		log.Printf("Error finding post: %v", err)
+		http.Error(w, "Post not found", http.StatusNotFound)
+		return
+	}
+	updatedPost, err := pClient.Client.Post.FindUnique(
+		db.Post.ID.Equals(postData.PostID),
 	).Update(
-		db.Post.Title.Set(profileData.Title),
-		db.Post.Description.Set(profileData.Description),
-		db.Post.Longitude.Set(profileData.Longitude),
-		db.Post.Latitude.Set(profileData.Latitude),
-		db.Post.Pictures.Set(profileData.Pictures),
-		db.Post.City.Set(profileData.City),
+		db.Post.Title.Set(postData.Title),
+		db.Post.Description.Set(postData.Description),
+		db.Post.Longitude.Set(postData.Longitude),
+		db.Post.Latitude.Set(postData.Latitude),
+		db.Post.Pictures.Set(postData.Pictures),
+		db.Post.City.Set(postData.City),
 	).Exec(pClient.Context)
 	if err != nil {
 		log.Printf("Error updating post: %v", err)
-		http.Error(w, "Failed to Update Post", http.StatusInternalServerError)
+		http.Error(w, "Failed to update post", http.StatusInternalServerError)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
-	helpers.WriteJSON(w, http.StatusOK, posts)
+	helpers.WriteJSON(w, http.StatusOK, updatedPost)
 }

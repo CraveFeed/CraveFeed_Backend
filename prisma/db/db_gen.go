@@ -43825,6 +43825,10 @@ func (r postActions) UpsertOne(
 	return v
 }
 
+func (r postActions) UpdateOne(equals postWithPrismaIDEqualsUniqueParam) {
+	
+}
+
 func (r postUpsertOne) Create(
 
 	_title PostWithPrismaTitleSetParam,
