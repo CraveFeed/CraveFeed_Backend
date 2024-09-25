@@ -92,6 +92,66 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 	helpers.WriteJSON(w, http.StatusOK, createdPost)
 }
 
+func GetPosts(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	pClient := database.PClient
+	posts, err := pClient.Client.Post.FindMany().With(
+		db.Post.Comments.Fetch().Take(3),
+		db.Post.Likes.Fetch(),
+		db.Post.RepostedPosts.Fetch(),
+	).Exec(pClient.Context)
+	if err != nil {
+		http.Error(w, "Cannot fetch posts", http.StatusInternalServerError)
+		fmt.Println("Error fetching posts:", err)
+		return
+	}
+	var responsePosts []interfaces.Post
+	for _, post := range posts {
+		var comments []interfaces.Comment
+		for _, comment := range post.Comments() {
+			comments = append(comments, interfaces.Comment{
+				CommentID: comment.ID,
+				Content:   comment.Content,
+				UserID:    comment.UserID,
+			})
+		}
+		likesCount := len(post.Likes())
+		repostsCount := len(post.RepostedPosts())
+		responsePosts = append(responsePosts, interfaces.Post{
+			PostID:      post.ID,
+			Title:       post.Title,
+			Description: post.Description,
+			Longitude:   post.Longitude,
+			Latitude:    post.Latitude,
+			Pictures:    post.Pictures,
+			City:        post.City,
+			UserID:      post.UserID,
+			Cuisine:     post.Cuisine,
+			Dish:        post.Dish,
+			Type:        post.Type,
+			Spiciness:   post.Spiciness,
+			Sweetness:   post.Sweetness,
+			Sourness:    post.Sourness,
+			Comments:    comments,
+			Likes:       likesCount,   // Set the likes count
+			Reposts:     repostsCount, // Set the reposts count
+		})
+	}
+	w.Header().Set("Content-Type", "application/json")
+	responseData, err := json.Marshal(responsePosts)
+	if err != nil {
+		http.Error(w, "Error marshalling response data", http.StatusInternalServerError)
+		fmt.Println("Error marshalling response data:", err)
+		return
+	}
+	_, err = w.Write(responseData)
+	if err != nil {
+		http.Error(w, "Error writing response", http.StatusInternalServerError)
+		fmt.Println("Error writing response:", err)
+		return
+	}
+}
+
 func CreateComment(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	pClient := database.PClient

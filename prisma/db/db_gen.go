@@ -7696,7 +7696,8 @@ type postQuery struct {
 	// @optional
 	OriginalPostID postQueryOriginalPostIDString
 
-	RepostedPosts postQueryRepostedPostsRelations
+	RepostedPosts  postQueryRepostedPostsRelations
+	FindManyParams PostWhereParam
 }
 
 func (postQuery) Not(params ...PostWhereParam) postDefaultParam {
