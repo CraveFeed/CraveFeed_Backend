@@ -18,6 +18,7 @@ model User {
   lastName  String
   Spiciness Int
   Sweetness Int
+  Dish      String
   Sourness  Int
   Type      String
   Allergies String

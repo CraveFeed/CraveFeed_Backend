@@ -10,6 +10,7 @@ CREATE TABLE "User" (
     "lastName" TEXT NOT NULL,
     "Spiciness" INTEGER NOT NULL,
     "Sweetness" INTEGER NOT NULL,
+    "Dish" TEXT NOT NULL,
     "Sourness" INTEGER NOT NULL,
     "Type" TEXT NOT NULL,
     "Allergies" TEXT NOT NULL,

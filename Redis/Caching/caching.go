@@ -11,7 +11,10 @@ import (
 
 var ctx = context.Background()
 
-const cacheKey = "all_posts"
+const (
+	cacheKey  = "all_posts"
+	cacheKey1 = "all_users"
+)
 
 func fetchAndCachePosts() error {
 	pClient := database.PClient
@@ -24,21 +27,45 @@ func fetchAndCachePosts() error {
 		return fmt.Errorf("cannot serialize posts: %v", err)
 	}
 	rdb := Redis.GetClient()
-	err = rdb.Set(ctx, cacheKey, postsJSON, 0).Err()
+	err = rdb.Set(ctx, cacheKey, postsJSON, time.Hour).Err()
 	if err != nil {
 		return fmt.Errorf("cannot cache posts: %v", err)
 	}
 	return nil
 }
 
+func fetchAndCacheUsers() error {
+	pClient := database.PClient
+	allUsers, err := pClient.Client.User.FindMany().Exec(pClient.Context)
+	if err != nil {
+		return fmt.Errorf("cannot fetch users: %v", err)
+	}
+	usersJSON, err := json.Marshal(allUsers)
+	if err != nil {
+		return fmt.Errorf("cannot serialize users: %v", err)
+	}
+	rdb := Redis.GetClient()
+	err = rdb.Set(ctx, cacheKey1, usersJSON, time.Hour).Err()
+	if err != nil {
+		return fmt.Errorf("cannot cache users: %v", err)
+	}
+	return nil
+}
+
 func UpdateCachePeriodically() {
 	for {
-		err := fetchAndCachePosts()
-		if err != nil {
-			fmt.Println("Error updating cache:", err)
+		if err := fetchAndCachePosts(); err != nil {
+			fmt.Println("Error updating posts cache:", err)
 		} else {
-			fmt.Println("Cache updated successfully")
+			fmt.Println("Posts cache updated successfully")
 		}
+
+		if err := fetchAndCacheUsers(); err != nil {
+			fmt.Println("Error updating users cache:", err)
+		} else {
+			fmt.Println("Users cache updated successfully")
+		}
+
 		time.Sleep(10 * time.Second)
 	}
 }
@@ -48,6 +75,23 @@ func FetchCachedData() ([]byte, error) {
 	cachedData, err := rdb.Get(ctx, cacheKey).Bytes()
 	if err != nil {
 		return nil, fmt.Errorf("cannot fetch cached data: %v", err)
+	}
+
+	if len(cachedData) == 0 {
+		return nil, fmt.Errorf("cached data is empty")
+	}
+
+	return cachedData, nil
+}
+
+func FetchCachedUserData() ([]byte, error) {
+	rdb := Redis.GetClient()
+	cachedData, err := rdb.Get(ctx, cacheKey1).Bytes()
+	if err != nil {
+		return nil, fmt.Errorf("cannot fetch cached user data: %v", err)
+	}
+	if len(cachedData) == 0 {
+		return nil, fmt.Errorf("cached user data is empty")
 	}
 	return cachedData, nil
 }

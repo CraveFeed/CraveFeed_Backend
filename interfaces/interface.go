@@ -11,6 +11,7 @@ type CreateUserRequest struct {
 	Spiciness int    `json:"spiciness"`
 	Sweetness int    `json:"sweetness"`
 	Sourness  int    `json:"sourness"`
+	Dish      string `json:"dish"`
 	Type      string `json:"type"`
 	Allergies string `json:"allergies"`
 	City      string `json:"city"`
@@ -118,4 +119,7 @@ type Post struct {
 	Comments    []Comment `json:"comments"`
 	Likes       int       `json:"likes"`
 	Reposts     int       `json:"reposts"`
+}
+
+type User struct {
 }

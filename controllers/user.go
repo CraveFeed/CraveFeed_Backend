@@ -28,6 +28,22 @@ func GetAllPosts(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func GetAllUsers(w http.ResponseWriter, r *http.Request) {
+	cachedData, err := Caching.FetchCachedUserData()
+	if err != nil {
+		http.Error(w, "Cannot fetch cached user data", http.StatusInternalServerError)
+		fmt.Println("Error fetching cached user data:", err)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	_, err = w.Write(cachedData)
+	if err != nil {
+		http.Error(w, "Error writing response", http.StatusInternalServerError)
+		fmt.Println("Error writing response:", err)
+		return
+	}
+}
+
 func CreateUser(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	pClient := database.PClient
@@ -48,6 +64,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		db.User.Spiciness.Set(userData.Spiciness),
 		db.User.Sweetness.Set(userData.Sweetness),
 		db.User.Sourness.Set(userData.Sourness),
+		db.User.Dish.Set(userData.Dish),
 		db.User.Type.Set(userData.Type),
 		db.User.Allergies.Set(userData.Allergies),
 		db.User.City.Set(userData.City),
@@ -152,6 +169,162 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func GetPostsByUsers(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	pClient := database.PClient
+	var userId interfaces.CreateProfileRequest
+	err := json.NewDecoder(r.Body).Decode(&userId)
+	if err != nil || userId.Id == "" {
+		http.Error(w, "Invalid user ID", http.StatusBadRequest)
+		fmt.Println("Error decoding user ID:", err)
+		return
+	}
+	posts, err := pClient.Client.Post.FindMany(
+		db.Post.User.Where(db.User.ID.Equals(userId.Id)),
+	).With(
+		db.Post.Comments.Fetch().Take(3),
+		db.Post.Likes.Fetch(),
+		db.Post.RepostedPosts.Fetch(),
+	).Exec(pClient.Context)
+	if err != nil {
+		http.Error(w, "Cannot fetch posts", http.StatusInternalServerError)
+		fmt.Println("Error fetching posts:", err)
+		return
+	}
+	if len(posts) == 0 {
+		http.Error(w, "No posts found for the user", http.StatusNotFound)
+		return
+	}
+	var responsePosts []interfaces.Post
+	for _, post := range posts {
+		var comments []interfaces.Comment
+		for _, comment := range post.Comments() {
+			comments = append(comments, interfaces.Comment{
+				CommentID: comment.ID,
+				Content:   comment.Content,
+				UserID:    comment.UserID,
+			})
+		}
+		likesCount := len(post.Likes())
+		repostsCount := len(post.RepostedPosts())
+		responsePosts = append(responsePosts, interfaces.Post{
+			PostID:      post.ID,
+			Title:       post.Title,
+			Description: post.Description,
+			Longitude:   post.Longitude,
+			Latitude:    post.Latitude,
+			Pictures:    post.Pictures,
+			City:        post.City,
+			UserID:      post.UserID,
+			Cuisine:     post.Cuisine,
+			Dish:        post.Dish,
+			Type:        post.Type,
+			Spiciness:   post.Spiciness,
+			Sweetness:   post.Sweetness,
+			Sourness:    post.Sourness,
+			Comments:    comments,
+			Likes:       likesCount,
+			Reposts:     repostsCount,
+		})
+	}
+	w.Header().Set("Content-Type", "application/json")
+	responseData, err := json.Marshal(responsePosts)
+	if err != nil {
+		http.Error(w, "Error marshalling response data", http.StatusInternalServerError)
+		fmt.Println("Error marshalling response data:", err)
+		return
+	}
+	_, err = w.Write(responseData)
+	if err != nil {
+		http.Error(w, "Error writing response", http.StatusInternalServerError)
+		fmt.Println("Error writing response:", err)
+		return
+	}
+}
+
+func GetFollowers(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	pClient := database.PClient
+	var userId interfaces.CreateProfileRequest
+	err := json.NewDecoder(r.Body).Decode(&userId)
+	if err != nil || userId.Id == "" {
+		http.Error(w, "Invalid request body or missing user ID", http.StatusBadRequest)
+		return
+	}
+	followers, err := pClient.Client.Follows.FindMany(
+		db.Follows.FollowingID.Equals(userId.Id),
+	).With(
+		db.Follows.Follower.Fetch(),
+	).Exec(pClient.Context)
+
+	if err != nil {
+		http.Error(w, "Cannot fetch followers", http.StatusInternalServerError)
+		fmt.Println("Error fetching followers:", err)
+		return
+	}
+	var followerUsers []map[string]string
+	for _, follow := range followers {
+		followerUsers = append(followerUsers, map[string]string{
+			"FirstName": follow.Follower().FirstName,
+			"Username":  follow.Follower().Username,
+		})
+	}
+	w.Header().Set("Content-Type", "application/json")
+	responseData, err := json.Marshal(followerUsers)
+	if err != nil {
+		http.Error(w, "Error marshalling response data", http.StatusInternalServerError)
+		fmt.Println("Error marshalling response data:", err)
+		return
+	}
+	_, err = w.Write(responseData)
+	if err != nil {
+		http.Error(w, "Error writing response", http.StatusInternalServerError)
+		fmt.Println("Error writing response:", err)
+		return
+	}
+}
+
+func GetFollowing(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	pClient := database.PClient
+	var userId interfaces.CreateProfileRequest
+	err := json.NewDecoder(r.Body).Decode(&userId)
+	if err != nil || userId.Id == "" {
+		http.Error(w, "Invalid request body or missing user ID", http.StatusBadRequest)
+		return
+	}
+	following, err := pClient.Client.Follows.FindMany(
+		db.Follows.FollowerID.Equals(userId.Id),
+	).With(
+		db.Follows.Following.Fetch(),
+	).Exec(pClient.Context)
+	if err != nil {
+		http.Error(w, "Cannot fetch following users", http.StatusInternalServerError)
+		fmt.Println("Error fetching following users:", err)
+		return
+	}
+	var followingUsers []map[string]string
+	for _, follow := range following {
+		followingUsers = append(followingUsers, map[string]string{
+			"FirstName": follow.Following().FirstName,
+			"Username":  follow.Following().Username,
+		})
+	}
+	w.Header().Set("Content-Type", "application/json")
+	responseData, err := json.Marshal(followingUsers)
+	if err != nil {
+		http.Error(w, "Error marshalling response data", http.StatusInternalServerError)
+		fmt.Println("Error marshalling response data:", err)
+		return
+	}
+	_, err = w.Write(responseData)
+	if err != nil {
+		http.Error(w, "Error writing response", http.StatusInternalServerError)
+		fmt.Println("Error writing response:", err)
+		return
+	}
+}
+
 func CreateComment(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	pClient := database.PClient
@@ -211,16 +384,32 @@ func HandleFollowRequest(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
-	createdFollow, err := pClient.Client.Follows.CreateOne(
-		db.Follows.FollowerID.Set(followReq.FollowerID),
-		db.Follows.FollowingID.Set(followReq.FollowingID),
-	).Exec(pClient.Context)
-	if err != nil {
-		http.Error(w, "Failed to create follow", http.StatusInternalServerError)
-		return
+	switch r.Method {
+	case http.MethodPost:
+		createdFollow, err := pClient.Client.Follows.CreateOne(
+			db.Follows.FollowerID.Set(followReq.FollowerID),
+			db.Follows.FollowingID.Set(followReq.FollowingID),
+		).Exec(pClient.Context)
+		if err != nil {
+			http.Error(w, "Failed to create follow", http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		helpers.WriteJSON(w, http.StatusOK, createdFollow)
+
+	case http.MethodDelete:
+		_, err := pClient.Client.Follows.FindMany(
+			db.Follows.FollowerID.Equals(followReq.FollowerID),
+			db.Follows.FollowingID.Equals(followReq.FollowingID),
+		).Delete().Exec(pClient.Context)
+		if err != nil {
+			http.Error(w, "Failed to unfollow", http.StatusInternalServerError)
+			return
+		}
+		w.WriteHeader(http.StatusNoContent)
+	default:
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	}
-	w.Header().Set("Content-Type", "application/json")
-	helpers.WriteJSON(w, http.StatusOK, createdFollow)
 }
 
 func GetProfileBio(w http.ResponseWriter, r *http.Request) {
@@ -247,12 +436,12 @@ func GetProfileBio(w http.ResponseWriter, r *http.Request) {
 		"lastname":      profile.LastName,
 		"noOfFollowers": len(profile.Followers()),
 		"noOfFollowing": len(profile.Following()),
+		"noOfPosts":     len(profile.Posts()),
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	helpers.WriteJSON(w, http.StatusOK, response)
 }
-
 func GetProfileInfo(w http.ResponseWriter, r *http.Request) {
 	pClient := database.PClient
 	var profileData interfaces.CreateProfileRequest

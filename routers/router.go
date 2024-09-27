@@ -34,6 +34,10 @@ func Routes() http.Handler {
 	router.Post("/searchByUsername", controllers.GetUsernameUserId)
 	router.Post("/editPost", controllers.EditPosts)
 	router.Post("/getPosts", controllers.GetPosts)
+	router.Post("/getPostsById", controllers.GetPostsByUsers)
+	router.Post("/getFollowers", controllers.GetFollowers)
+	router.Post("/getFollowing", controllers.GetFollowing)
+	router.Post("/users", controllers.GetAllUsers)
 
 	return router
 
