@@ -330,23 +330,19 @@ func CreateComment(w http.ResponseWriter, r *http.Request) {
 	pClient := database.PClient
 	var commentData interfaces.CreateCommentRequest
 	err := json.NewDecoder(r.Body).Decode(&commentData)
-
 	if err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
-
 	createdComment, err := pClient.Client.Comment.CreateOne(
 		db.Comment.Content.Set(commentData.Content),
 		db.Comment.PostID.Set(commentData.PostID),
 		db.Comment.UserID.Set(commentData.UserID),
 	).Exec(pClient.Context)
-
 	if err != nil {
 		http.Error(w, "Failed to create comment", http.StatusInternalServerError)
 		return
 	}
-
 	w.Header().Set("Content-Type", "application/json")
 	helpers.WriteJSON(w, http.StatusOK, createdComment)
 }
@@ -384,32 +380,16 @@ func HandleFollowRequest(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
-	switch r.Method {
-	case http.MethodPost:
-		createdFollow, err := pClient.Client.Follows.CreateOne(
-			db.Follows.FollowerID.Set(followReq.FollowerID),
-			db.Follows.FollowingID.Set(followReq.FollowingID),
-		).Exec(pClient.Context)
-		if err != nil {
-			http.Error(w, "Failed to create follow", http.StatusInternalServerError)
-			return
-		}
-		w.Header().Set("Content-Type", "application/json")
-		helpers.WriteJSON(w, http.StatusOK, createdFollow)
-
-	case http.MethodDelete:
-		_, err := pClient.Client.Follows.FindMany(
-			db.Follows.FollowerID.Equals(followReq.FollowerID),
-			db.Follows.FollowingID.Equals(followReq.FollowingID),
-		).Delete().Exec(pClient.Context)
-		if err != nil {
-			http.Error(w, "Failed to unfollow", http.StatusInternalServerError)
-			return
-		}
-		w.WriteHeader(http.StatusNoContent)
-	default:
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+	createdFollow, err := pClient.Client.Follows.CreateOne(
+		db.Follows.FollowerID.Set(followReq.FollowerID),
+		db.Follows.FollowingID.Set(followReq.FollowingID),
+	).Exec(pClient.Context)
+	if err != nil {
+		http.Error(w, "Failed to create follow", http.StatusInternalServerError)
+		return
 	}
+	w.Header().Set("Content-Type", "application/json")
+	helpers.WriteJSON(w, http.StatusOK, createdFollow)
 }
 
 func GetProfileBio(w http.ResponseWriter, r *http.Request) {
