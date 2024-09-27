@@ -4,6 +4,7 @@ import (
 	"context"
 	"cravefeed_backend/Redis"
 	"cravefeed_backend/database"
+	"cravefeed_backend/prisma/db"
 	"encoding/json"
 	"fmt"
 	"time"
@@ -36,16 +37,36 @@ func fetchAndCachePosts() error {
 
 func fetchAndCacheUsers() error {
 	pClient := database.PClient
-	allUsers, err := pClient.Client.User.FindMany().Exec(pClient.Context)
+	allUsers, err := pClient.Client.User.FindMany().With(
+		db.User.Followers.Fetch(),
+	).Exec(pClient.Context)
 	if err != nil {
 		return fmt.Errorf("cannot fetch users: %v", err)
 	}
-	usersJSON, err := json.Marshal(allUsers)
+	type CachedUser struct {
+		ID            string `json:"id"`
+		Type          string `json:"type"`
+		Dish          string `json:"dish"`
+		City          string `json:"city"`
+		FollowerCount int    `json:"followerCount"`
+	}
+	var cachedUsers []CachedUser
+	for _, user := range allUsers {
+		cachedUser := CachedUser{
+			ID:            user.ID,
+			Type:          user.Type,
+			Dish:          user.Dish,
+			City:          user.City,
+			FollowerCount: len(user.Followers()),
+		}
+		cachedUsers = append(cachedUsers, cachedUser)
+	}
+	usersJSON, err := json.Marshal(cachedUsers)
 	if err != nil {
 		return fmt.Errorf("cannot serialize users: %v", err)
 	}
 	rdb := Redis.GetClient()
-	err = rdb.Set(ctx, cacheKey1, usersJSON, time.Hour).Err()
+	err = rdb.Set(pClient.Context, cacheKey1, usersJSON, time.Hour).Err()
 	if err != nil {
 		return fmt.Errorf("cannot cache users: %v", err)
 	}

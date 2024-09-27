@@ -29,14 +29,54 @@ func GetAllPosts(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetAllUsers(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	var userId interfaces.CreateProfileRequest
+	err := json.NewDecoder(r.Body).Decode(&userId)
+	if err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		fmt.Println("Error decoding request body:", err)
+		return
+	}
 	cachedData, err := Caching.FetchCachedUserData()
+	fmt.Println(cachedData)
 	if err != nil {
 		http.Error(w, "Cannot fetch cached user data", http.StatusInternalServerError)
 		fmt.Println("Error fetching cached user data:", err)
 		return
 	}
+	var cachedUsers []interfaces.CachedUser
+	err = json.Unmarshal(cachedData, &cachedUsers)
+	if err != nil {
+		http.Error(w, "Error unmarshalling cached user data", http.StatusInternalServerError)
+		fmt.Println("Error unmarshalling cached user data:", err)
+		return
+	}
+	var currentUser interfaces.CachedUser
+	var otherUsers []interfaces.CachedUser
+	for _, user := range cachedUsers {
+		if user.ID == userId.Id {
+			currentUser = user
+		} else {
+			otherUsers = append(otherUsers, user)
+		}
+	}
+	type Response struct {
+		CurrentUser interfaces.CachedUser   `json:"currentUser"`
+		OtherUsers  []interfaces.CachedUser `json:"otherUsers"`
+	}
+
+	response := Response{
+		CurrentUser: currentUser,
+		OtherUsers:  otherUsers,
+	}
+	responseData, err := json.Marshal(response)
+	if err != nil {
+		http.Error(w, "Error marshalling response data", http.StatusInternalServerError)
+		fmt.Println("Error marshalling response data:", err)
+		return
+	}
 	w.Header().Set("Content-Type", "application/json")
-	_, err = w.Write(cachedData)
+	_, err = w.Write(responseData)
 	if err != nil {
 		http.Error(w, "Error writing response", http.StatusInternalServerError)
 		fmt.Println("Error writing response:", err)

@@ -17,6 +17,14 @@ type CreateUserRequest struct {
 	City      string `json:"city"`
 }
 
+type CachedUser struct {
+	ID            string `json:"id"`
+	Type          string `json:"type"`
+	Dish          string `json:"dish"`
+	City          string `json:"city"`
+	FollowerCount int    `json:"followerCount"`
+}
+
 type CreateProfileRequest struct {
 	Id string `json:"id"`
 }
