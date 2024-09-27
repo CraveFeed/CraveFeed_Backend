@@ -8,6 +8,8 @@ CREATE TABLE "User" (
     "avatar" TEXT NOT NULL,
     "firstName" TEXT NOT NULL,
     "lastName" TEXT NOT NULL,
+    "Latitude" TEXT NOT NULL,
+    "Longitude" TEXT NOT NULL,
     "Spiciness" INTEGER NOT NULL,
     "Sweetness" INTEGER NOT NULL,
     "Dish" TEXT NOT NULL,

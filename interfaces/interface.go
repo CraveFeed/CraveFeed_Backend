@@ -15,6 +15,8 @@ type CreateUserRequest struct {
 	Type      string `json:"type"`
 	Allergies string `json:"allergies"`
 	City      string `json:"city"`
+	Latitude  string `json:"latitude"`
+	Longitude string `json:"longitude"`
 }
 
 type CachedUser struct {
@@ -129,5 +131,24 @@ type Post struct {
 	Reposts     int       `json:"reposts"`
 }
 
-type User struct {
+type UserResponse struct {
+	UserId    string `json:"userId"`
+	Dish      string `json:"dish"`
+	Type      string `json:"type"`
+	Allergies string `json:"allergies"`
+	Latitude  string `json:"latitude"`
+	Longitude string `json:"longitude"`
+}
+
+type PostData struct {
+	PostID     string `json:"post_id"`
+	Cuisine    string `json:"cuisine"`
+	Dish       string `json:"dish"`
+	Type       string `json:"type"`
+	LikesCount int    `json:"likes_count"`
+	Latitude   string `json:"latitude"`
+	Longitude  string `json:"longitude"`
+	Sweetness  int    `json:"sweetness"`
+	Sourness   int    `json:"sourness"`
+	Spiciness  int    `json:"spiciness"`
 }

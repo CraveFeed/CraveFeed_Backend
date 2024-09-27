@@ -16,6 +16,8 @@ model User {
   avatar    String
   firstName String
   lastName  String
+  Latitude  String
+  Longitude String
   Spiciness Int
   Sweetness Int
   Dish      String

@@ -13,19 +13,66 @@ import (
 )
 
 func GetAllPosts(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	var userIdRequest interfaces.CreateProfileRequest
+	err := json.NewDecoder(r.Body).Decode(&userIdRequest)
+	if err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		fmt.Println("Error decoding request body:", err)
+		return
+	}
 	cachedData, err := Caching.FetchCachedData()
 	if err != nil {
 		http.Error(w, "Cannot fetch cached data", http.StatusInternalServerError)
 		fmt.Println("Error fetching cached data:", err)
 		return
 	}
+	var posts []interfaces.PostData
+	err = json.Unmarshal(cachedData, &posts)
+	if err != nil {
+		http.Error(w, "Error decoding cached data", http.StatusInternalServerError)
+		fmt.Println("Error decoding cached data:", err)
+		return
+	}
+	userResponse, err := GetUserData(userIdRequest.Id)
+	if err != nil {
+		http.Error(w, "Cannot fetch user data", http.StatusInternalServerError)
+		fmt.Println("Error fetching user data:", err)
+		return
+	}
+	response := struct {
+		User  interfaces.UserResponse `json:"user"`
+		Posts []interfaces.PostData   `json:"posts"`
+	}{
+		User:  userResponse,
+		Posts: posts,
+	}
 	w.Header().Set("Content-Type", "application/json")
-	_, err = w.Write(cachedData)
+	err = json.NewEncoder(w).Encode(response)
 	if err != nil {
 		http.Error(w, "Error writing response", http.StatusInternalServerError)
 		fmt.Println("Error writing response:", err)
 		return
 	}
+}
+
+func GetUserData(userId string) (interfaces.UserResponse, error) {
+	pClient := database.PClient
+	user, err := pClient.Client.User.FindUnique(
+		db.User.ID.Equals(userId),
+	).Exec(pClient.Context)
+	if err != nil {
+		return interfaces.UserResponse{}, fmt.Errorf("cannot fetch user data: %v", err)
+	}
+	userResponse := interfaces.UserResponse{
+		UserId:    user.ID,
+		Dish:      user.Dish,
+		Type:      user.Type,
+		Allergies: user.Allergies,
+		Latitude:  user.Latitude,
+		Longitude: user.Longitude,
+	}
+	return userResponse, nil
 }
 
 func GetAllUsers(w http.ResponseWriter, r *http.Request) {
@@ -108,6 +155,8 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		db.User.Type.Set(userData.Type),
 		db.User.Allergies.Set(userData.Allergies),
 		db.User.City.Set(userData.City),
+		db.User.Longitude.Set(userData.Longitude),
+		db.User.Latitude.Set(userData.Latitude),
 	).Exec(pClient.Context)
 	if err != nil {
 		http.Error(w, "Failed to create user", http.StatusInternalServerError)
