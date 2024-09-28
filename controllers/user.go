@@ -476,7 +476,7 @@ func GetFollowers(w http.ResponseWriter, r *http.Request) {
 	var followerUsers []map[string]string
 	for _, follow := range followers {
 		followerUsers = append(followerUsers, map[string]string{
-			"FirstName": follow.Follower().FirstName,
+			"Name":      follow.Follower().FirstName + " " + follow.Follower().LastName,
 			"Username":  follow.Follower().Username,
 			"AvatarUrl": follow.Follower().Avatar,
 		})
@@ -518,7 +518,7 @@ func GetFollowing(w http.ResponseWriter, r *http.Request) {
 	var followingUsers []map[string]string
 	for _, follow := range following {
 		followingUsers = append(followingUsers, map[string]string{
-			"FirstName": follow.Following().FirstName,
+			"Name":      follow.Following().FirstName + " " + follow.Following().LastName,
 			"Username":  follow.Following().Username,
 			"AvatarUrl": follow.Following().Avatar,
 		})
