@@ -258,6 +258,53 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func CheckUserCredentials(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	var credentials struct {
+		Username string `json:"username"`
+		Password string `json:"password"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&credentials); err != nil {
+		http.Error(w, "Invalid request payload", http.StatusBadRequest)
+		return
+	}
+	pClient := database.PClient
+	user, err := pClient.Client.User.FindFirst(
+		db.User.Username.Equals(credentials.Username),
+		db.User.Password.Equals(credentials.Password),
+	).Exec(pClient.Context)
+
+	if err != nil {
+		http.Error(w, "Error fetching user", http.StatusInternalServerError)
+		fmt.Println("Error fetching user:", err)
+		return
+	}
+	if user == nil {
+		http.Error(w, "User not found", http.StatusUnauthorized)
+		return
+	}
+	response := struct {
+		Message string `json:"message"`
+		UserID  string `json:"userId"`
+	}{
+		Message: "User authenticated successfully",
+		UserID:  user.ID,
+	}
+	w.Header().Set("Content-Type", "application/json")
+	responseData, err := json.Marshal(response)
+	if err != nil {
+		http.Error(w, "Error marshalling response data", http.StatusInternalServerError)
+		fmt.Println("Error marshalling response data:", err)
+		return
+	}
+	_, err = w.Write(responseData)
+	if err != nil {
+		http.Error(w, "Error writing response", http.StatusInternalServerError)
+		fmt.Println("Error writing response:", err)
+		return
+	}
+}
+
 func GetPostsByUsers(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	pClient := database.PClient

@@ -38,6 +38,7 @@ func Routes() http.Handler {
 	router.Post("/getFollowers", controllers.GetFollowers)
 	router.Post("/getFollowing", controllers.GetFollowing)
 	router.Post("/users", controllers.GetAllUsers)
+	router.Post("/signIn", controllers.CheckUserCredentials)
 	return router
 
 }
