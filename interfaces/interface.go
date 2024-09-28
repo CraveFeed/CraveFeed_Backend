@@ -106,9 +106,12 @@ type EditPostRequest struct {
 }
 
 type Comment struct {
-	CommentID string `json:"commentId"`
-	Content   string `json:"content"`
-	UserID    string `json:"userId"`
+	CommentID   string `json:"commentId"`
+	Content     string `json:"content"`
+	UserID      string `json:"userId"`
+	UserAvatar  string `json:"userAvatar"`
+	CommentTime string `json:"commentTime"`
+	Name        string `json:"name"`
 }
 
 type Post struct {
@@ -151,4 +154,28 @@ type PostData struct {
 	Sweetness  int    `json:"sweetness"`
 	Sourness   int    `json:"sourness"`
 	Spiciness  int    `json:"spiciness"`
+}
+
+type Post1 struct {
+	PostID          string    `json:"postId"`
+	Title           string    `json:"title"`
+	Description     string    `json:"description"`
+	Longitude       string    `json:"longitude"`
+	Latitude        string    `json:"latitude"`
+	Pictures        string    `json:"pictures"`
+	City            string    `json:"city"`
+	UserID          string    `json:"userId"`
+	Cuisine         string    `json:"cuisine"`
+	Dish            string    `json:"dish"`
+	Type            string    `json:"type"`
+	Spiciness       int       `json:"spiciness"`
+	Sweetness       int       `json:"sweetness"`
+	Sourness        int       `json:"sourness"`
+	Comments        []Comment `json:"comments"`
+	Likes           int       `json:"likes"`
+	Reposts         int       `json:"reposts"`
+	UserAvatar      string    `json:"userAvatar"`
+	Username        string    `json:"username"`
+	Name            string    `json:"name"`
+	TimeDescription string    `json:"timeDescription"`
 }

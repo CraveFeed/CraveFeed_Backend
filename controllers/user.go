@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 )
 
 func GetAllPosts(w http.ResponseWriter, r *http.Request) {
@@ -201,46 +202,95 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 func GetPosts(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	pClient := database.PClient
-	posts, err := pClient.Client.Post.FindMany().With(
-		db.Post.Comments.Fetch().Take(3),
+
+	var requestBody struct {
+		UserID string `json:"userId"`
+	}
+	err := json.NewDecoder(r.Body).Decode(&requestBody)
+	if err != nil || requestBody.UserID == "" {
+		http.Error(w, "Invalid user ID", http.StatusBadRequest)
+		fmt.Println("Error decoding user ID:", err)
+		return
+	}
+
+	posts, err := pClient.Client.Post.FindMany(
+		db.Post.Not(
+			db.Post.UserID.Equals(requestBody.UserID),
+		),
+	).With(
+		db.Post.Comments.Fetch().With(
+			db.Comment.User.Fetch(),
+		).Take(3),
 		db.Post.Likes.Fetch(),
 		db.Post.RepostedPosts.Fetch(),
+		db.Post.User.Fetch(),
 	).Exec(pClient.Context)
+
 	if err != nil {
 		http.Error(w, "Cannot fetch posts", http.StatusInternalServerError)
 		fmt.Println("Error fetching posts:", err)
 		return
 	}
-	var responsePosts []interfaces.Post
+
+	if len(posts) == 0 {
+		http.Error(w, "No posts found", http.StatusNotFound)
+		return
+	}
+
+	var responsePosts []interfaces.Post1
 	for _, post := range posts {
 		var comments []interfaces.Comment
 		for _, comment := range post.Comments() {
+			commentTimeSinceCreated := time.Since(comment.CreatedAt)
+			var commentTimeDescription string
+			if commentTimeSinceCreated.Hours() < 24 {
+				commentTimeDescription = "a while ago"
+			} else {
+				commentTimeDescription = fmt.Sprintf("%d days ago", int(commentTimeSinceCreated.Hours()/24))
+			}
 			comments = append(comments, interfaces.Comment{
-				CommentID: comment.ID,
-				Content:   comment.Content,
-				UserID:    comment.UserID,
+				CommentID:   comment.ID,
+				Content:     comment.Content,
+				UserID:      comment.UserID,
+				UserAvatar:  comment.User().Avatar,
+				Name:        comment.User().FirstName + " " + comment.User().LastName,
+				CommentTime: commentTimeDescription,
 			})
 		}
+
+		timeSinceUpdated := time.Since(post.UpdatedAt)
+		var timeDescription string
+		if timeSinceUpdated.Hours() < 24 {
+			timeDescription = "a while ago"
+		} else {
+			timeDescription = fmt.Sprintf("%d days ago", int(timeSinceUpdated.Hours()/24))
+		}
+
 		likesCount := len(post.Likes())
 		repostsCount := len(post.RepostedPosts())
-		responsePosts = append(responsePosts, interfaces.Post{
-			PostID:      post.ID,
-			Title:       post.Title,
-			Description: post.Description,
-			Longitude:   post.Longitude,
-			Latitude:    post.Latitude,
-			Pictures:    post.Pictures,
-			City:        post.City,
-			UserID:      post.UserID,
-			Cuisine:     post.Cuisine,
-			Dish:        post.Dish,
-			Type:        post.Type,
-			Spiciness:   post.Spiciness,
-			Sweetness:   post.Sweetness,
-			Sourness:    post.Sourness,
-			Comments:    comments,
-			Likes:       likesCount,   // Set the likes count
-			Reposts:     repostsCount, // Set the reposts count
+
+		responsePosts = append(responsePosts, interfaces.Post1{
+			PostID:          post.ID,
+			Title:           post.Title,
+			Description:     post.Description,
+			Longitude:       post.Longitude,
+			Latitude:        post.Latitude,
+			Pictures:        post.Pictures,
+			City:            post.City,
+			UserID:          post.UserID,
+			UserAvatar:      post.User().Avatar,
+			Username:        post.User().Username,
+			Name:            post.User().FirstName + " " + post.User().LastName,
+			Cuisine:         post.Cuisine,
+			Dish:            post.Dish,
+			Type:            post.Type,
+			Spiciness:       post.Spiciness,
+			Sweetness:       post.Sweetness,
+			Sourness:        post.Sourness,
+			Comments:        comments,
+			Likes:           likesCount,
+			Reposts:         repostsCount,
+			TimeDescription: timeDescription,
 		})
 	}
 	w.Header().Set("Content-Type", "application/json")
@@ -318,9 +368,12 @@ func GetPostsByUsers(w http.ResponseWriter, r *http.Request) {
 	posts, err := pClient.Client.Post.FindMany(
 		db.Post.User.Where(db.User.ID.Equals(userId.Id)),
 	).With(
-		db.Post.Comments.Fetch().Take(3),
+		db.Post.Comments.Fetch().With(
+			db.Comment.User.Fetch(),
+		).Take(3),
 		db.Post.Likes.Fetch(),
 		db.Post.RepostedPosts.Fetch(),
+		db.Post.User.Fetch(),
 	).Exec(pClient.Context)
 	if err != nil {
 		http.Error(w, "Cannot fetch posts", http.StatusInternalServerError)
@@ -331,36 +384,58 @@ func GetPostsByUsers(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "No posts found for the user", http.StatusNotFound)
 		return
 	}
-	var responsePosts []interfaces.Post
+	var responsePosts []interfaces.Post1
 	for _, post := range posts {
 		var comments []interfaces.Comment
 		for _, comment := range post.Comments() {
+			commentTimeSinceCreated := time.Since(comment.CreatedAt)
+			var commentTimeDescription string
+			if commentTimeSinceCreated.Hours() < 24 {
+				commentTimeDescription = "a while ago"
+			} else {
+				commentTimeDescription = fmt.Sprintf("%d days ago", int(commentTimeSinceCreated.Hours()/24))
+			}
 			comments = append(comments, interfaces.Comment{
-				CommentID: comment.ID,
-				Content:   comment.Content,
-				UserID:    comment.UserID,
+				CommentID:   comment.ID,
+				Content:     comment.Content,
+				UserID:      comment.UserID,
+				UserAvatar:  comment.User().Avatar,
+				Name:        comment.User().FirstName + " " + comment.User().LastName,
+				CommentTime: commentTimeDescription,
 			})
+		}
+
+		timeSinceUpdated := time.Since(post.UpdatedAt)
+		var timeDescription string
+		if timeSinceUpdated.Hours() < 24 {
+			timeDescription = "a while ago"
+		} else {
+			timeDescription = fmt.Sprintf("%d days ago", int(timeSinceUpdated.Hours()/24))
 		}
 		likesCount := len(post.Likes())
 		repostsCount := len(post.RepostedPosts())
-		responsePosts = append(responsePosts, interfaces.Post{
-			PostID:      post.ID,
-			Title:       post.Title,
-			Description: post.Description,
-			Longitude:   post.Longitude,
-			Latitude:    post.Latitude,
-			Pictures:    post.Pictures,
-			City:        post.City,
-			UserID:      post.UserID,
-			Cuisine:     post.Cuisine,
-			Dish:        post.Dish,
-			Type:        post.Type,
-			Spiciness:   post.Spiciness,
-			Sweetness:   post.Sweetness,
-			Sourness:    post.Sourness,
-			Comments:    comments,
-			Likes:       likesCount,
-			Reposts:     repostsCount,
+		responsePosts = append(responsePosts, interfaces.Post1{
+			PostID:          post.ID,
+			Title:           post.Title,
+			Description:     post.Description,
+			Longitude:       post.Longitude,
+			Latitude:        post.Latitude,
+			Pictures:        post.Pictures,
+			City:            post.City,
+			UserID:          post.UserID,
+			UserAvatar:      post.User().Avatar, // Include user's avatar
+			Username:        post.User().Username,
+			Name:            post.User().FirstName + " " + post.User().LastName,
+			Cuisine:         post.Cuisine,
+			Dish:            post.Dish,
+			Type:            post.Type,
+			Spiciness:       post.Spiciness,
+			Sweetness:       post.Sweetness,
+			Sourness:        post.Sourness,
+			Comments:        comments,
+			Likes:           likesCount,
+			Reposts:         repostsCount,
+			TimeDescription: timeDescription,
 		})
 	}
 	w.Header().Set("Content-Type", "application/json")
@@ -370,6 +445,7 @@ func GetPostsByUsers(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Error marshalling response data:", err)
 		return
 	}
+
 	_, err = w.Write(responseData)
 	if err != nil {
 		http.Error(w, "Error writing response", http.StatusInternalServerError)
