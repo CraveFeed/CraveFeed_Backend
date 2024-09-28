@@ -468,7 +468,6 @@ func GetFollowers(w http.ResponseWriter, r *http.Request) {
 	).With(
 		db.Follows.Follower.Fetch(),
 	).Exec(pClient.Context)
-
 	if err != nil {
 		http.Error(w, "Cannot fetch followers", http.StatusInternalServerError)
 		fmt.Println("Error fetching followers:", err)
@@ -479,6 +478,7 @@ func GetFollowers(w http.ResponseWriter, r *http.Request) {
 		followerUsers = append(followerUsers, map[string]string{
 			"FirstName": follow.Follower().FirstName,
 			"Username":  follow.Follower().Username,
+			"AvatarUrl": follow.Follower().Avatar,
 		})
 	}
 	w.Header().Set("Content-Type", "application/json")
@@ -520,6 +520,7 @@ func GetFollowing(w http.ResponseWriter, r *http.Request) {
 		followingUsers = append(followingUsers, map[string]string{
 			"FirstName": follow.Following().FirstName,
 			"Username":  follow.Following().Username,
+			"AvatarUrl": follow.Following().Avatar,
 		})
 	}
 	w.Header().Set("Content-Type", "application/json")
