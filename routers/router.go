@@ -39,6 +39,7 @@ func Routes() http.Handler {
 	router.Post("/getFollowing", controllers.GetFollowing)
 	router.Post("/users", controllers.GetAllUsers)
 	router.Post("/signIn", controllers.CheckUserCredentials)
+	router.Post("/getRecommendation", controllers.GetRecommendedData)
 	return router
 
 }

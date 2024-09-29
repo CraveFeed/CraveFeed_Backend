@@ -78,6 +78,180 @@ func GetUserData(userId string) (interfaces.UserResponse, error) {
 	return userResponse, nil
 }
 
+func GetRecommendedData(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	var userId interfaces.CreateProfileRequest
+	err := json.NewDecoder(r.Body).Decode(&userId)
+	if err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		fmt.Println("Error decoding request body:", err)
+		return
+	}
+
+	cachedData, err := Caching.FetchCachedUserData()
+	if err != nil {
+		http.Error(w, "Cannot fetch cached user data", http.StatusInternalServerError)
+		return
+	}
+
+	var cachedUsers []interfaces.CachedUser
+	err = json.Unmarshal(cachedData, &cachedUsers)
+	if err != nil {
+		http.Error(w, "Error unmarshalling cached user data", http.StatusInternalServerError)
+		return
+	}
+
+	var currentUser interfaces.CachedUser
+	var otherUsers []interfaces.CachedUser
+
+	for _, user := range cachedUsers {
+		if user.ID == userId.Id {
+			currentUser = user
+		} else {
+			otherUsers = append(otherUsers, user)
+		}
+	}
+
+	if currentUser.ID == "" {
+		http.Error(w, "Current user not found", http.StatusNotFound)
+		return
+	}
+
+	response := struct {
+		CurrentUser interfaces.CachedUser   `json:"currentUser"`
+		OtherUsers  []interfaces.CachedUser `json:"otherUsers"`
+	}{
+		CurrentUser: currentUser,
+		OtherUsers:  otherUsers,
+	}
+
+	responseData, err := json.Marshal(response)
+	if err != nil {
+		http.Error(w, "Error marshalling request data", http.StatusInternalServerError)
+		return
+	}
+
+	externalAPIUrl := "http://ec2-3-24-218-106.ap-southeast-2.compute.amazonaws.com:8000/recommend_users"
+	req, err := http.NewRequest("POST", externalAPIUrl, bytes.NewBuffer(responseData))
+	if err != nil {
+		http.Error(w, "Error creating request to external API", http.StatusInternalServerError)
+		return
+	}
+	req.Header.Set("Content-Type", "application/json")
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		http.Error(w, "Error calling external API", http.StatusInternalServerError)
+		return
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		http.Error(w, "Error reading external API response", http.StatusInternalServerError)
+		return
+	}
+
+	var apiResponse struct {
+		InputUser        string `json:"input_user"`
+		RecommendedUsers []struct {
+			UserID          string  `json:"user_id"`
+			SimilarityScore float64 `json:"similarity_score"`
+		} `json:"recommended_users"`
+	}
+
+	err = json.Unmarshal(body, &apiResponse)
+	if err != nil {
+		http.Error(w, "Error unmarshalling external API response", http.StatusInternalServerError)
+		return
+	}
+
+	var allUserPosts []interfaces.Post1
+
+	pClient := database.PClient
+	for _, recommendedUser := range apiResponse.RecommendedUsers {
+		posts, err := pClient.Client.Post.FindMany(
+			db.Post.UserID.Equals(recommendedUser.UserID),
+		).With(
+			db.Post.Comments.Fetch().With(
+				db.Comment.User.Fetch(),
+			).Take(3),
+			db.Post.Likes.Fetch(),
+			db.Post.RepostedPosts.Fetch(),
+			db.Post.User.Fetch(),
+		).Exec(pClient.Context)
+
+		if err != nil {
+			http.Error(w, "Cannot fetch posts for user "+recommendedUser.UserID, http.StatusInternalServerError)
+			return
+		}
+
+		for _, post := range posts {
+			var comments []interfaces.Comment
+			for _, comment := range post.Comments() {
+				commentTimeSinceCreated := time.Since(comment.CreatedAt)
+				var commentTimeDescription string
+				if commentTimeSinceCreated.Hours() < 24 {
+					commentTimeDescription = "a while ago"
+				} else {
+					commentTimeDescription = fmt.Sprintf("%d days ago", int(commentTimeSinceCreated.Hours()/24))
+				}
+				comments = append(comments, interfaces.Comment{
+					CommentID:   comment.ID,
+					Content:     comment.Content,
+					UserID:      comment.UserID,
+					UserAvatar:  comment.User().Avatar,
+					Name:        comment.User().FirstName + " " + comment.User().LastName,
+					CommentTime: commentTimeDescription,
+				})
+			}
+
+			timeSinceUpdated := time.Since(post.UpdatedAt)
+			var timeDescription string
+			if timeSinceUpdated.Hours() < 24 {
+				timeDescription = "a while ago"
+			} else {
+				timeDescription = fmt.Sprintf("%d days ago", int(timeSinceUpdated.Hours()/24))
+			}
+
+			likesCount := len(post.Likes())
+			repostsCount := len(post.RepostedPosts())
+
+			allUserPosts = append(allUserPosts, interfaces.Post1{
+				PostID:          post.ID,
+				Title:           post.Title,
+				Description:     post.Description,
+				Longitude:       post.Longitude,
+				Latitude:        post.Latitude,
+				Pictures:        post.Pictures,
+				City:            post.City,
+				UserID:          post.UserID,
+				UserAvatar:      post.User().Avatar,
+				Username:        post.User().Username,
+				Name:            post.User().FirstName + " " + post.User().LastName,
+				Cuisine:         post.Cuisine,
+				Dish:            post.Dish,
+				Type:            post.Type,
+				Spiciness:       post.Spiciness,
+				Sweetness:       post.Sweetness,
+				Sourness:        post.Sourness,
+				Comments:        comments,
+				Likes:           likesCount,
+				Reposts:         repostsCount,
+				TimeDescription: timeDescription,
+			})
+		}
+	}
+	responseData, err = json.Marshal(allUserPosts)
+	if err != nil {
+		http.Error(w, "Error marshalling response data", http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(responseData)
+}
+
 func GetAllUsers(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	var userId interfaces.CreateProfileRequest
