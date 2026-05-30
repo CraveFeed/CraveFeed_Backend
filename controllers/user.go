@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"golang.org/x/crypto/bcrypt"
 	"log"
 	"net/http"
 	"time"
@@ -375,10 +376,15 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(userData.Password), bcrypt.DefaultCost)
+	if err != nil {
+		http.Error(w, "Failed to hash password", http.StatusInternalServerError)
+		return
+	}
 	createdUser, err := pClient.Client.User.CreateOne(
 		db.User.Email.Set(userData.Email),
 		db.User.Username.Set(userData.Username),
-		db.User.Password.Set(userData.Password),
+		db.User.Password.Set(string(hashedPassword)),
 		db.User.Bio.Set(userData.Bio),
 		db.User.Avatar.Set(userData.Avatar),
 		db.User.FirstName.Set(userData.FirstName),
@@ -555,16 +561,19 @@ func CheckUserCredentials(w http.ResponseWriter, r *http.Request) {
 	pClient := database.PClient
 	user, err := pClient.Client.User.FindFirst(
 		db.User.Username.Equals(credentials.Username),
-		db.User.Password.Equals(credentials.Password),
 	).Exec(pClient.Context)
 
 	if err != nil {
-		http.Error(w, "Error fetching user", http.StatusInternalServerError)
+		http.Error(w, "User not found", http.StatusUnauthorized)
 		fmt.Println("Error fetching user:", err)
 		return
 	}
 	if user == nil {
 		http.Error(w, "User not found", http.StatusUnauthorized)
+		return
+	}
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(credentials.Password)); err != nil {
+		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
 		return
 	}
 	response := struct {
@@ -1047,3 +1056,4 @@ func EditPosts(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	helpers.WriteJSON(w, http.StatusOK, updatedPost)
 }
+
